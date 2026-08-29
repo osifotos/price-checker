@@ -1,0 +1,147 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.5",
+  "planned_values": {
+    "root_module": {}
+  },
+  "resource_changes": [
+    {
+      "address": "aws_instance.web[0]",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": {
+          "instance_type": "t3.medium",
+          "ami": "ami-0abcd1234",
+          "root_block_device": [
+            { "volume_type": "gp3", "volume_size": 30 }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "root_block_device": [ { "volume_id": true } ]
+        }
+      }
+    },
+    {
+      "address": "aws_instance.web[1]",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "instance_type": "t3.medium", "root_block_device": [ { "volume_type": "gp3", "volume_size": 30 } ] },
+        "after_unknown": { "id": true }
+      }
+    },
+    {
+      "address": "module.net.aws_nat_gateway.this",
+      "module_address": "module.net",
+      "mode": "managed",
+      "type": "aws_nat_gateway",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "connectivity_type": "public" },
+        "after_unknown": { "id": true, "allocation_id": true }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.assets",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "assets",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "bucket": "my-assets" },
+        "after_unknown": { "arn": true }
+      }
+    },
+    {
+      "address": "aws_eip.old",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "old",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["delete"],
+        "before": { "domain": "vpc" },
+        "after": null,
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "data.aws_ami.ubuntu",
+      "module_address": "",
+      "mode": "data",
+      "type": "aws_ami",
+      "name": "ubuntu",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["read"],
+        "before": null,
+        "after": { "most_recent": true },
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.main",
+      "module_address": "",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create", "delete"],
+        "before": { "instance_class": "db.t3.small", "engine": "postgres", "allocated_storage": 20, "multi_az": false },
+        "after": { "instance_class": "db.t3.medium", "engine": "postgres", "allocated_storage": 50, "multi_az": true },
+        "after_unknown": { "id": true, "address": true }
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": { "region": { "constant_value": "us-east-1" } }
+      },
+      "aws.west": {
+        "name": "aws",
+        "alias": "west",
+        "expressions": { "region": { "constant_value": "us-west-2" } }
+      }
+    },
+    "root_module": {
+      "resources": [
+        { "address": "aws_instance.web", "provider_config_key": "aws" },
+        { "address": "aws_s3_bucket.assets", "provider_config_key": "aws" },
+        { "address": "aws_eip.old", "provider_config_key": "aws" },
+        { "address": "aws_db_instance.main", "provider_config_key": "aws.west" }
+      ],
+      "module_calls": {
+        "net": {
+          "module": {
+            "resources": [
+              { "address": "aws_nat_gateway.this", "provider_config_key": "aws" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

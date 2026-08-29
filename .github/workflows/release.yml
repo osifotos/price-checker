@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  binaries:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 }
+          - { goos: darwin, goarch: amd64 }
+          - { goos: darwin, goarch: arm64 }
+          - { goos: windows, goarch: amd64, ext: ".exe" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+      - name: build
+        env:
+          CGO_ENABLED: "0"
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          V="${GITHUB_REF_NAME}"
+          P="github.com/example/price-checker/internal/cli"
+          go build -trimpath \
+            -ldflags "-s -w -X ${P}.version=${V} -X ${P}.commit=${GITHUB_SHA} -X ${P}.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -o "price-checker-${GOOS}-${GOARCH}${{ matrix.ext }}" ./cmd/price-checker
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: price-checker-*

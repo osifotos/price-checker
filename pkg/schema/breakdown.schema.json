@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/example/price-checker/schema/breakdown.schema.json",
+  "title": "price-checker breakdown",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "currency", "period", "resources", "modules",
+    "total_monthly", "total_hourly", "not_estimated", "summary", "metadata"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "currency": { "type": "string" },
+    "period": { "enum": ["month", "hour"] },
+    "total_monthly": { "$ref": "#/$defs/decimal" },
+    "total_hourly": { "$ref": "#/$defs/decimal" },
+    "resources": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
+    "modules": { "type": "array", "items": { "$ref": "#/$defs/moduleTotal" } },
+    "not_estimated": { "type": "array", "items": { "$ref": "#/$defs/notEstimated" } },
+    "summary": { "$ref": "#/$defs/summary" },
+    "metadata": { "$ref": "#/$defs/metadata" }
+  },
+  "$defs": {
+    "decimal": { "type": "string", "pattern": "^-?[0-9]+(\\.[0-9]+)?$" },
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["address", "type", "name", "module", "region", "monthly_cost", "hourly_cost", "cost_components"],
+      "properties": {
+        "address": { "type": "string" },
+        "type": { "type": "string" },
+        "name": { "type": "string" },
+        "module": { "type": "string" },
+        "region": { "type": "string" },
+        "monthly_cost": { "$ref": "#/$defs/decimal" },
+        "hourly_cost": { "$ref": "#/$defs/decimal" },
+        "cost_components": { "type": "array", "items": { "$ref": "#/$defs/component" } }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "unit", "price_per_unit", "monthly_quantity", "monthly_cost", "hourly_cost", "usage_based"],
+      "properties": {
+        "name": { "type": "string" },
+        "unit": { "type": "string" },
+        "price_per_unit": { "$ref": "#/$defs/decimal" },
+        "monthly_quantity": { "$ref": "#/$defs/decimal" },
+        "monthly_cost": { "$ref": "#/$defs/decimal" },
+        "hourly_cost": { "$ref": "#/$defs/decimal" },
+        "usage_based": { "type": "boolean" }
+      }
+    },
+    "moduleTotal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "monthly_cost", "hourly_cost", "resource_count"],
+      "properties": {
+        "module": { "type": "string" },
+        "monthly_cost": { "$ref": "#/$defs/decimal" },
+        "hourly_cost": { "$ref": "#/$defs/decimal" },
+        "resource_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "notEstimated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["address", "type", "reason_code", "message"],
+      "properties": {
+        "address": { "type": "string" },
+        "type": { "type": "string" },
+        "component": { "type": "string" },
+        "reason_code": {
+          "enum": ["UNSUPPORTED_TYPE", "MISSING_ATTRIBUTE", "UNKNOWN_AFTER_APPLY", "NO_USAGE_DATA", "PRICING_API_ERROR", "UNSUPPORTED_CONFIGURATION"]
+        },
+        "message": { "type": "string" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resources_total", "resources_estimated", "resources_not_estimated", "components_estimated", "components_not_estimated"],
+      "properties": {
+        "resources_total": { "type": "integer", "minimum": 0 },
+        "resources_estimated": { "type": "integer", "minimum": 0 },
+        "resources_not_estimated": { "type": "integer", "minimum": 0 },
+        "components_estimated": { "type": "integer", "minimum": 0 },
+        "components_not_estimated": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_version", "generated_at", "plan_format_version", "regions", "usage_file_used", "price_queries", "cache_hit_ratio", "dedup_hits"],
+      "properties": {
+        "tool_version": { "type": "string" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "plan_format_version": { "type": "string" },
+        "regions": { "type": "array", "items": { "type": "string" } },
+        "usage_file_used": { "type": "boolean" },
+        "price_queries": { "type": "integer", "minimum": 0 },
+        "cache_hit_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "dedup_hits": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

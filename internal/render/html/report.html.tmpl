@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>price-checker — {{.Title}}</title>
+<style>{{.CSS}}</style>
+</head>
+<body>
+<header>
+  <h1>price-checker</h1>
+  <p class="subtitle">{{.Title}} · {{.Currency}}</p>
+  {{if .IsDiff}}
+  <p class="headline">{{.DeltaHeadline}}</p>
+  {{else}}
+  <p class="headline">{{.TotalMonthly}} <span class="dim">/ month</span> &nbsp; {{.TotalHourly}} <span class="dim">/ hour</span></p>
+  {{end}}
+  <p class="meta">
+    tool {{.Meta.ToolVersion}} · generated {{.Meta.GeneratedAt}} · plan format {{.Meta.PlanFormatVersion}}
+    {{if .Meta.Regions}}· regions {{range $i, $r := .Meta.Regions}}{{if $i}}, {{end}}{{$r}}{{end}}{{end}}
+    {{if .Meta.UsageFileUsed}}· usage file applied{{end}}
+  </p>
+</header>
+
+{{if .IsDiff}}
+<h2>Changes</h2>
+<table>
+  <thead><tr><th>Resource</th><th>Kind</th><th class="num">Prior</th><th class="num">New</th><th class="num">Change</th></tr></thead>
+  <tbody>
+  {{range .Changes}}
+    <tr class="{{if .NotEstimated}}not-estimated{{end}}">
+      <td><code>{{.Address}}</code></td>
+      <td>{{.Kind}}</td>
+      {{if .NotEstimated}}
+      <td class="num">—</td><td class="num">—</td><td class="num">not estimated</td>
+      {{else}}
+      <td class="num">{{.Prior}}</td><td class="num">{{.New}}</td><td class="num">{{.Delta}}</td>
+      {{end}}
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{else}}
+<h2>By module</h2>
+<table>
+  <thead><tr><th>Module</th><th class="num">Resources</th><th class="num">Monthly</th></tr></thead>
+  <tbody>
+  {{range .Modules}}<tr><td>{{.Name}}</td><td class="num">{{.Count}}</td><td class="num">{{.Monthly}}</td></tr>{{end}}
+  </tbody>
+</table>
+
+<h2>By resource</h2>
+<table>
+  <thead><tr><th>Resource</th><th>Region</th><th class="num">Monthly</th><th class="num">Hourly</th></tr></thead>
+  <tbody>
+  {{range .Resources}}
+    <tr class="res-row"><td><code>{{.Address}}</code></td><td>{{.Region}}</td><td class="num">{{.Monthly}}</td><td class="num">{{.Hourly}}</td></tr>
+    {{if .Components}}
+    <tr class="components"><td colspan="4">
+      <button class="toggle" type="button">components</button>
+      <table class="inner" hidden>
+        <thead><tr><th>Component</th><th>Unit</th><th class="num">Price</th><th class="num">Qty/mo</th><th class="num">Monthly</th></tr></thead>
+        <tbody>
+        {{range .Components}}<tr><td>{{.Name}}</td><td>{{.Unit}}</td><td class="num">{{.Price}}</td><td class="num">{{.Quantity}}</td><td class="num">{{.Monthly}}</td></tr>{{end}}
+        </tbody>
+      </table>
+    </td></tr>
+    {{end}}
+  {{end}}
+  </tbody>
+</table>
+{{end}}
+
+{{if .NotEstimated}}
+<h2>Not estimated ({{len .NotEstimated}})</h2>
+<table>
+  <thead><tr><th>Resource</th><th>Component</th><th>Reason</th><th>Detail</th></tr></thead>
+  <tbody>
+  {{range .NotEstimated}}<tr><td><code>{{.Address}}</code></td><td>{{if .Component}}{{.Component}}{{else}}—{{end}}</td><td><code>{{.ReasonCode}}</code></td><td>{{.Message}}</td></tr>{{end}}
+  </tbody>
+</table>
+{{end}}
+
+<script>{{.JS}}</script>
+</body>
+</html>

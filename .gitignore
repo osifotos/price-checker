@@ -1,0 +1,25 @@
+# Binaries
+/bin/
+/dist/
+price-checker
+price-checker-*-*
+*.exe
+
+# Go
+*.test
+*.out
+/coverage.*
+
+# Property-based test failure files (regenerated on failure)
+**/testdata/rapid/
+
+# Local price cache
+.price-checker/
+
+# Upstream AI-DLC tooling (separate repo, not part of this project)
+/aidlc-workflows/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
