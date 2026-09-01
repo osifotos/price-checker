@@ -26,7 +26,7 @@ func TestRendererImportsAreClean(t *testing.T) {
 		}
 		for _, imp := range f.Imports {
 			path := strings.Trim(imp.Path.Value, `"`)
-			ok := isStd(path) || path == "github.com/example/price-checker/pkg/schema"
+			ok := isStd(path) || path == "github.com/mtosin123/tf-price_checker/pkg/schema"
 			if !ok {
 				t.Errorf("%s imports %q — renderers may only use stdlib + pkg/schema", name, path)
 			}

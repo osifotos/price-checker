@@ -7,7 +7,7 @@ Stories: US-MACHINE-OUTPUT-1 (owned).
 
 | # | Step | Status |
 |---|---|---|
-| 1 | `go.mod` (module `github.com/example/price-checker`, `go 1.23`, deps) | [x] |
+| 1 | `go.mod` (module `github.com/mtosin123/tf-price_checker`, `go 1.23`, deps) | [x] |
 | 2 | `doc.go`, `version.go`, `reason.go` | [x] |
 | 3 | `money.go` (`StringToRat`, `RatToString`, `MustRat`) | [x] |
 | 4 | `breakdown.go` (types + `NewBreakdown` + `Canonicalize`) | [x] |

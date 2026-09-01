@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"sort"
 
-	"github.com/example/price-checker/internal/plan"
-	"github.com/example/price-checker/pkg/schema"
+	"github.com/mtosin123/tf-price_checker/internal/plan"
+	"github.com/mtosin123/tf-price_checker/pkg/schema"
 )
 
 // PricedResource is one resource after its pricer has run.

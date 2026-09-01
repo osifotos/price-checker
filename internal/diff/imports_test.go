@@ -30,7 +30,7 @@ func TestDifferImportsAreClean(t *testing.T) {
 			if i := strings.IndexByte(path, '/'); i >= 0 {
 				first = path[:i]
 			}
-			if strings.Contains(first, ".") && path != "github.com/example/price-checker/pkg/schema" {
+			if strings.Contains(first, ".") && path != "github.com/mtosin123/tf-price_checker/pkg/schema" {
 				t.Errorf("%s imports %q", name, path)
 			}
 		}

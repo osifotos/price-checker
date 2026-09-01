@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/example/price-checker/internal/plan"
-	"github.com/example/price-checker/internal/pricing"
-	"github.com/example/price-checker/pkg/schema"
+	"github.com/mtosin123/tf-price_checker/internal/plan"
+	"github.com/mtosin123/tf-price_checker/internal/pricing"
+	"github.com/mtosin123/tf-price_checker/pkg/schema"
 )
 
 // fakeQuerier returns a price dimension when the query Purpose contains one of

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/example/price-checker/internal/config"
+	"github.com/mtosin123/tf-price_checker/internal/config"
 )
 
 func TestEvaluate(t *testing.T) {

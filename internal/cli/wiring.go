@@ -7,15 +7,15 @@ import (
 
 	awspricing "github.com/aws/aws-sdk-go-v2/service/pricing"
 
-	"github.com/example/price-checker/internal/awsauth"
-	"github.com/example/price-checker/internal/config"
-	"github.com/example/price-checker/internal/engine"
-	"github.com/example/price-checker/internal/estimator"
-	"github.com/example/price-checker/internal/plan"
-	"github.com/example/price-checker/internal/pricing"
-	pricingaws "github.com/example/price-checker/internal/pricing/aws"
-	"github.com/example/price-checker/internal/render"
-	"github.com/example/price-checker/pkg/schema"
+	"github.com/mtosin123/tf-price_checker/internal/awsauth"
+	"github.com/mtosin123/tf-price_checker/internal/config"
+	"github.com/mtosin123/tf-price_checker/internal/engine"
+	"github.com/mtosin123/tf-price_checker/internal/estimator"
+	"github.com/mtosin123/tf-price_checker/internal/plan"
+	"github.com/mtosin123/tf-price_checker/internal/pricing"
+	pricingaws "github.com/mtosin123/tf-price_checker/internal/pricing/aws"
+	"github.com/mtosin123/tf-price_checker/internal/render"
+	"github.com/mtosin123/tf-price_checker/pkg/schema"
 )
 
 // buildEstimator constructs the production, AWS-backed estimator.

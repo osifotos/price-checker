@@ -79,7 +79,7 @@ For the Go module and repo:
 
 A) Single Go module at repo root, module path `github.com/<you>/price-checker` — tell me the path to use
 
-B) Single module, placeholder module path `github.com/example/price-checker` for now, easy to rename later
+B) Single module, placeholder module path `github.com/mtosin123/tf-price_checker` for now, easy to rename later
 
 X) Other (please describe after [Answer]: tag below)
 

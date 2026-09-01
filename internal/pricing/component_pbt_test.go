@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/example/price-checker/pkg/schema"
+	"github.com/mtosin123/tf-price_checker/pkg/schema"
 	"pgregory.net/rapid"
 )
 

@@ -14,7 +14,7 @@ explicitly with a reason.
 Download a static binary from the releases page, or:
 
 ```
-go install github.com/example/price-checker/cmd/price-checker@latest
+go install github.com/mtosin123/tf-price_checker/cmd/price-checker@latest
 ```
 
 No runtime dependencies. `terraform` is only needed for directory input mode.

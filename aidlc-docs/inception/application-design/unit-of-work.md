@@ -2,7 +2,7 @@
 
 **Deployment model**: single statically-linked Go binary (`price-checker`). Not microservices — units are **development units** for the per-unit CONSTRUCTION loop. Each unit maps to one or more Go packages.
 
-**Module path**: `github.com/example/price-checker` (placeholder; rename later — Q6=B).
+**Module path**: `github.com/mtosin123/tf-price_checker` (placeholder; rename later — Q6=B).
 
 ## Code organization strategy (greenfield)
 

@@ -156,7 +156,7 @@
 
 ## Units Generation - Planning Answers Received
 **Timestamp**: 2026-08-29T11:35:46Z
-**User Input**: "done" (answers in unit-of-work-plan.md): Q1=A (separate U0 schema unit + 6 others), Q2=B (merge renderers + diff into one output-and-diff unit), Q3=C (early walking-skeleton increment of the CLI unit), Q4=B (DoD = compiles/interfaces/example tests/vet/gofmt + PBT targets + recorded fixtures), Q5=A (all ~16 AWS pricers before U2 is done), Q6=B (placeholder module path github.com/example/price-checker)
+**User Input**: "done" (answers in unit-of-work-plan.md): Q1=A (separate U0 schema unit + 6 others), Q2=B (merge renderers + diff into one output-and-diff unit), Q3=C (early walking-skeleton increment of the CLI unit), Q4=B (DoD = compiles/interfaces/example tests/vet/gofmt + PBT targets + recorded fixtures), Q5=A (all ~16 AWS pricers before U2 is done), Q6=B (placeholder module path github.com/mtosin123/tf-price_checker)
 **AI Response**: "Analyzed answers - no ambiguities. Reconciled Q1+Q2: final decomposition is 6 units: U0 schema, U1 plan-ingest, U2 pricing-core (all 16 pricers), U3 cost-engine, U4 output-and-diff, U5 cli-app (with an early walking-skeleton increment). Requesting approval to proceed to Part 2 generation."
 **Context**: INCEPTION - Units Generation, Part 1, Steps 7-9
 

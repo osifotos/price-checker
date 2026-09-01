@@ -1,4 +1,4 @@
-module github.com/example/price-checker
+module github.com/mtosin123/tf-price_checker
 
 go 1.23
 

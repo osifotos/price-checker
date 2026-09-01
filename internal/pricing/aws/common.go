@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/example/price-checker/internal/pricing"
+	"github.com/mtosin123/tf-price_checker/internal/pricing"
 )
 
 func i64(n int64) string { return strconv.FormatInt(n, 10) }

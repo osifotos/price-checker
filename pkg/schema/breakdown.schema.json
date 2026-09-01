@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/example/price-checker/schema/breakdown.schema.json",
+  "$id": "https://github.com/mtosin123/tf-price_checker/schema/breakdown.schema.json",
   "title": "price-checker breakdown",
   "type": "object",
   "additionalProperties": false,

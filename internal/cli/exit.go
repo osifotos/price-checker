@@ -1,6 +1,6 @@
 package cli
 
-import "github.com/example/price-checker/internal/config"
+import "github.com/mtosin123/tf-price_checker/internal/config"
 
 // Exit codes. Stable across patch releases and documented in --help / README.
 const (

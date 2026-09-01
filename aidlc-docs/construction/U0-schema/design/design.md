@@ -96,7 +96,7 @@
 | PBT | `pgregory.net/rapid` | test |
 | JSON Schema validation | `github.com/santhosh-tekuri/jsonschema/v5` | test |
 
-`go` directive: `go 1.23`. Module: `github.com/example/price-checker`.
+`go` directive: `go 1.23`. Module: `github.com/mtosin123/tf-price_checker`.
 
 ---
 

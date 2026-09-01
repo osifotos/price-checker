@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/example/price-checker/pkg/schema"
+	"github.com/mtosin123/tf-price_checker/pkg/schema"
 )
 
 // Model exposes usage assumptions to pricers.

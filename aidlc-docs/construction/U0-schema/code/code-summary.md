@@ -1,6 +1,6 @@
 # U0 `schema` — Code Summary
 
-**Location**: `pkg/schema/` (+ `pkg/schema/schematest/`) · **Module**: `github.com/example/price-checker` (`go.mod` created)
+**Location**: `pkg/schema/` (+ `pkg/schema/schematest/`) · **Module**: `github.com/mtosin123/tf-price_checker` (`go.mod` created)
 
 > Note: the Go toolchain is not installed in this environment, so `go build` / `go test` / `gofmt` have not been run here. They run in the Build and Test stage. `go mod tidy` must be run there to populate `go.sum`.
 

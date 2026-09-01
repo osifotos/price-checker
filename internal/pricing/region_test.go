@@ -3,7 +3,7 @@ package pricing
 import (
 	"testing"
 
-	"github.com/example/price-checker/internal/plan"
+	"github.com/mtosin123/tf-price_checker/internal/plan"
 )
 
 func TestRegionResolver(t *testing.T) {
