@@ -1,8 +1,8 @@
-# Binaries
+# Binaries (root-anchored so cmd/price-checker/ is NOT ignored)
 /bin/
 /dist/
-price-checker
-price-checker-*-*
+/price-checker
+/price-checker-*-*
 *.exe
 
 # Go
