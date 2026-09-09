@@ -46,6 +46,9 @@ var keysByType = map[string][]usageKey{
 		{"storage_gb", "Aurora storage GB per month"},
 		{"monthly_io_requests", "Aurora I/O requests per month"},
 	},
+	"aws_sqs_queue": {
+		{"monthly_requests", "SendMessage/ReceiveMessage/DeleteMessage (etc.) API requests per month"},
+	},
 }
 
 // knownUsageKeys is the flattened set of every accepted usage key.

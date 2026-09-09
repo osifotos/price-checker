@@ -18,6 +18,10 @@ const (
 	// ReasonUnsupportedConfiguration: the resource type is supported but this
 	// particular configuration is not (for example an unmodelled engine).
 	ReasonUnsupportedConfiguration ReasonCode = "UNSUPPORTED_CONFIGURATION"
+	// ReasonNotBillable: the resource type never carries a direct AWS charge of
+	// its own (its cost, if any, is attributed to other resources or usage this
+	// tool does not model), so $0.00 is the correct, final answer.
+	ReasonNotBillable ReasonCode = "NOT_BILLABLE"
 )
 
 var allReasonCodes = map[ReasonCode]string{
@@ -27,6 +31,7 @@ var allReasonCodes = map[ReasonCode]string{
 	ReasonNoUsageData:              "no usage value was supplied for this component",
 	ReasonPricingAPIError:          "the AWS Price List API could not be queried",
 	ReasonUnsupportedConfiguration: "this configuration of the resource is not modelled",
+	ReasonNotBillable:              "this resource type has no direct AWS cost of its own",
 }
 
 // Valid reports whether c is one of the defined reason codes.

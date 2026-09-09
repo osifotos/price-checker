@@ -18,8 +18,8 @@ func TestReasonCodeValid(t *testing.T) {
 	if schema.ReasonCode("NOPE").Valid() {
 		t.Error("unknown reason code reported valid")
 	}
-	if len(schema.ReasonCodes()) != 6 {
-		t.Fatalf("expected 6 reason codes, got %d", len(schema.ReasonCodes()))
+	if len(schema.ReasonCodes()) != 7 {
+		t.Fatalf("expected 7 reason codes, got %d", len(schema.ReasonCodes()))
 	}
 }
 

@@ -139,6 +139,11 @@ The minimum IAM permission is `pricing:GetProducts` (read-only).
 
 AWS only. Priced: EC2, EBS (+snapshots, EIP/public IPv4), RDS + Aurora,
 ElastiCache, DynamoDB (provisioned), S3, Lambda, ALB/NLB/CLB, NAT Gateway, EKS
-(cluster + node groups), CloudWatch (alarms, dashboards). Not modelled:
+(cluster + node groups), CloudWatch (alarms, dashboards), SQS. Not modelled:
 Reserved Instances / Savings Plans / Spot, private pricing, free tier,
-non-AWS providers, non-USD currency.
+non-AWS providers, non-USD currency, Cognito, API Gateway (v1/v2), EventBridge.
+
+Resource types that never carry a direct AWS charge of their own (route
+tables, security groups, subnets, VPCs, IAM roles/policies, an ECS cluster,
+etc.) are reported with reason `NOT_BILLABLE` rather than `UNSUPPORTED_TYPE` —
+$0.00 is the correct, final answer for these.

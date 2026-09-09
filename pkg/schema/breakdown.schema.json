@@ -71,7 +71,7 @@
         "type": { "type": "string" },
         "component": { "type": "string" },
         "reason_code": {
-          "enum": ["UNSUPPORTED_TYPE", "MISSING_ATTRIBUTE", "UNKNOWN_AFTER_APPLY", "NO_USAGE_DATA", "PRICING_API_ERROR", "UNSUPPORTED_CONFIGURATION"]
+          "enum": ["UNSUPPORTED_TYPE", "MISSING_ATTRIBUTE", "UNKNOWN_AFTER_APPLY", "NO_USAGE_DATA", "PRICING_API_ERROR", "UNSUPPORTED_CONFIGURATION", "NOT_BILLABLE"]
         },
         "message": { "type": "string" }
       }

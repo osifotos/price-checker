@@ -30,6 +30,8 @@ func Pricers() []pricing.Pricer {
 		eksClusterPricer{},
 		eksNodeGroupPricer{},
 		cloudWatchPricer{},
+		sqsQueuePricer{},
+		freeResourcePricer{},
 	}
 }
 

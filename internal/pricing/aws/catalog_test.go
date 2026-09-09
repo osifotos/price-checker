@@ -12,6 +12,8 @@ func TestCatalogCoversDocumentedTypes(t *testing.T) {
 		"aws_lambda_function", "aws_s3_bucket",
 		"aws_eks_cluster", "aws_eks_node_group",
 		"aws_cloudwatch_log_group", "aws_cloudwatch_metric_alarm", "aws_cloudwatch_dashboard",
+		"aws_sqs_queue",
+		"aws_route_table", "aws_security_group", "aws_subnet", "aws_vpc", "aws_ecs_cluster",
 	}
 	for _, typ := range want {
 		if _, ok := cat.For(typ); !ok {
