@@ -1,0 +1,12 @@
+version: "2"
+linters:
+  settings:
+    errcheck:
+      # These write to in-memory buffers/stdio streams whose real write errors
+      # are already surfaced via the paired Flush()/return-value check.
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (*bufio.Writer).Flush
+        - (*text/tabwriter.Writer).Flush

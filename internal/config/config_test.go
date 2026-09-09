@@ -10,7 +10,9 @@ import (
 func TestResolvePrecedence(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "price-checker.yml")
-	os.WriteFile(cfgPath, []byte("format: json\nconcurrency: 4\nperiod: hour\n"), 0o600)
+	if err := os.WriteFile(cfgPath, []byte("format: json\nconcurrency: 4\nperiod: hour\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 
 	in := Inputs{
 		ConfigPath: cfgPath,
@@ -43,8 +45,14 @@ func TestResolvePrecedence(t *testing.T) {
 func TestResolveNoFile(t *testing.T) {
 	dir := t.TempDir()
 	old, _ := os.Getwd()
-	os.Chdir(dir)
-	defer os.Chdir(old)
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Chdir(old); err != nil {
+			t.Fatal(err)
+		}
+	}()
 
 	cfg, prov, warns, err := Resolve(Inputs{Values: map[string]Raw{}})
 	if err != nil {
@@ -61,7 +69,9 @@ func TestResolveNoFile(t *testing.T) {
 func TestResolveUnknownKeyWarns(t *testing.T) {
 	dir := t.TempDir()
 	p := filepath.Join(dir, "c.yml")
-	os.WriteFile(p, []byte("format: json\nbogus: 1\n"), 0o600)
+	if err := os.WriteFile(p, []byte("format: json\nbogus: 1\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	_, _, warns, err := Resolve(Inputs{ConfigPath: p, Values: map[string]Raw{}})
 	if err != nil {
 		t.Fatal(err)
@@ -74,7 +84,9 @@ func TestResolveUnknownKeyWarns(t *testing.T) {
 func TestResolveBadYAML(t *testing.T) {
 	dir := t.TempDir()
 	p := filepath.Join(dir, "c.yml")
-	os.WriteFile(p, []byte("format: [unterminated"), 0o600)
+	if err := os.WriteFile(p, []byte("format: [unterminated"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	if _, _, _, err := Resolve(Inputs{ConfigPath: p, Values: map[string]Raw{}}); err == nil {
 		t.Fatal("expected error for bad YAML")
 	}

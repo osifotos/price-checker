@@ -80,7 +80,7 @@ func (l *fileLoader) loadFromDir(ctx context.Context, dir string) ([]byte, error
 	}
 	tmpPath := tmp.Name()
 	_ = tmp.Close()
-	defer os.Remove(tmpPath)
+	defer func() { _ = os.Remove(tmpPath) }()
 
 	if _, stderr, err := l.run.run(ctx, dir, "plan", "-input=false", "-out", tmpPath); err != nil {
 		return nil, fmt.Errorf("terraform plan failed: %s: %w", trimStderr(stderr), err)

@@ -10,13 +10,19 @@ func TestClassify(t *testing.T) {
 	dir := t.TempDir()
 
 	planFile := filepath.Join(dir, "plan.json")
-	os.WriteFile(planFile, []byte(`{"format_version":"1.2","resource_changes":[]}`), 0o600)
+	if err := os.WriteFile(planFile, []byte(`{"format_version":"1.2","resource_changes":[]}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
 
 	priorFile := filepath.Join(dir, "prior.json")
-	os.WriteFile(priorFile, []byte(`{"schema_version":"1.0","currency":"USD","resources":[]}`), 0o600)
+	if err := os.WriteFile(priorFile, []byte(`{"schema_version":"1.0","currency":"USD","resources":[]}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
 
 	otherFile := filepath.Join(dir, "other.txt")
-	os.WriteFile(otherFile, []byte(`hello`), 0o600)
+	if err := os.WriteFile(otherFile, []byte(`hello`), 0o600); err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []struct {
 		in   string
