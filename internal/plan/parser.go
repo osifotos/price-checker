@@ -43,6 +43,8 @@ func (parser) Parse(raw []byte) (*Plan, error) {
 			if pc.Expressions.Region != nil {
 				if s, ok := pc.Expressions.Region.ConstantValue.(string); ok {
 					region = s
+				} else if s, ok := resolveVarRegion(pc.Expressions.Region.References, w.Variables); ok {
+					region = s
 				}
 			}
 			p.ProviderConfigs[key] = ProviderConfig{Name: pc.Name, Alias: pc.Alias, ConstantRegion: region}
@@ -133,6 +135,31 @@ func splitVersion(v string) (major, minor int, err error) {
 		return 0, 0, err
 	}
 	return major, minor, nil
+}
+
+// resolveVarRegion resolves a provider's `region` expression when it references
+// a root input variable (e.g. `region = var.aws_region`) rather than a literal.
+// It looks up the variable's actual value from the plan's top-level
+// "variables" map, which reflects what was really used for this run (-var,
+// tfvars, TF_VAR_*, or the variable's default). Only a direct "var.NAME"
+// reference resolving to a plain string is supported; anything else (locals,
+// data sources, expressions) is left unresolved.
+func resolveVarRegion(refs []string, vars map[string]variableWire) (string, bool) {
+	for _, ref := range refs {
+		name, ok := strings.CutPrefix(ref, "var.")
+		if !ok {
+			continue
+		}
+		v, ok := vars[name]
+		if !ok {
+			continue
+		}
+		var s string
+		if err := json.Unmarshal(v.Value, &s); err == nil {
+			return s, true
+		}
+	}
+	return "", false
 }
 
 // lookupProviderKey resolves a possibly count/for_each-indexed resource address

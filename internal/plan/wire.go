@@ -5,10 +5,17 @@ import "encoding/json"
 // planWire mirrors the parts of `terraform show -json` output that price-checker
 // uses. Fields it does not need are omitted; unknown JSON keys are ignored.
 type planWire struct {
-	FormatVersion    string               `json:"format_version"`
-	TerraformVersion string               `json:"terraform_version"`
-	ResourceChanges  []resourceChangeWire `json:"resource_changes"`
-	Configuration    *configWire          `json:"configuration"`
+	FormatVersion    string                  `json:"format_version"`
+	TerraformVersion string                  `json:"terraform_version"`
+	ResourceChanges  []resourceChangeWire    `json:"resource_changes"`
+	Configuration    *configWire             `json:"configuration"`
+	Variables        map[string]variableWire `json:"variables"`
+}
+
+// variableWire is one entry of the plan's top-level "variables" map: the
+// actual input value used for this run (from -var, tfvars, env, or default).
+type variableWire struct {
+	Value json.RawMessage `json:"value"`
 }
 
 type resourceChangeWire struct {
@@ -38,7 +45,8 @@ type providerConfigWire struct {
 	Alias       string `json:"alias"`
 	Expressions struct {
 		Region *struct {
-			ConstantValue any `json:"constant_value"`
+			ConstantValue any      `json:"constant_value"`
+			References    []string `json:"references"`
 		} `json:"region"`
 	} `json:"expressions"`
 }

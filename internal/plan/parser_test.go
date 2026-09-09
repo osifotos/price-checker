@@ -116,6 +116,39 @@ func TestProviderConfigRegion(t *testing.T) {
 	}
 }
 
+func TestProviderConfigRegionFromVariable(t *testing.T) {
+	raw := []byte(`{
+		"format_version": "1.2",
+		"terraform_version": "1.9.5",
+		"variables": { "aws_region": { "value": "eu-central-1" } },
+		"resource_changes": [],
+		"configuration": {
+			"provider_config": {
+				"aws": {
+					"name": "aws",
+					"expressions": { "region": { "references": ["var.aws_region", "var"] } }
+				},
+				"aws.unresolved": {
+					"name": "aws",
+					"alias": "unresolved",
+					"expressions": { "region": { "references": ["local.region", "local"] } }
+				}
+			},
+			"root_module": { "resources": [] }
+		}
+	}`)
+	p, err := NewParser().Parse(raw)
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	if got := p.ProviderConfigs["aws"].ConstantRegion; got != "eu-central-1" {
+		t.Errorf("region from var = %q, want eu-central-1", got)
+	}
+	if got := p.ProviderConfigs["aws.unresolved"].ConstantRegion; got != "" {
+		t.Errorf("region from local should be unresolved, got %q", got)
+	}
+}
+
 func TestPriorResources(t *testing.T) {
 	p := loadFixture(t, "ec2_s3_natgw.json")
 	prior := map[string]bool{}
