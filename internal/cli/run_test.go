@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mtosin123/tf-price_checker/internal/config"
-	"github.com/mtosin123/tf-price_checker/internal/estimator"
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
-	"github.com/mtosin123/tf-price_checker/pkg/schema/schematest"
+	"github.com/osifotos/price-checker/internal/config"
+	"github.com/osifotos/price-checker/internal/estimator"
+	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema/schematest"
 )
 
 type fakeEst struct {

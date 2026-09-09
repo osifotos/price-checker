@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mtosin123/tf-price_checker/internal/render"
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
-	"github.com/mtosin123/tf-price_checker/pkg/schema/schematest"
+	"github.com/osifotos/price-checker/internal/render"
+	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema/schematest"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 )
 

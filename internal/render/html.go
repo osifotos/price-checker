@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 //go:embed html/report.html.tmpl

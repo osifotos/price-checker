@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
-	"github.com/mtosin123/tf-price_checker/pkg/schema/schematest"
+	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema/schematest"
 )
 
 func TestBreakdownCanonicalizeDeterministic(t *testing.T) {

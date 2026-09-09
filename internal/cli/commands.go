@@ -13,12 +13,12 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/mtosin123/tf-price_checker/internal/config"
-	"github.com/mtosin123/tf-price_checker/internal/diff"
-	"github.com/mtosin123/tf-price_checker/internal/estimator"
-	"github.com/mtosin123/tf-price_checker/internal/render"
-	"github.com/mtosin123/tf-price_checker/internal/usage"
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
+	"github.com/osifotos/price-checker/internal/config"
+	"github.com/osifotos/price-checker/internal/diff"
+	"github.com/osifotos/price-checker/internal/estimator"
+	"github.com/osifotos/price-checker/internal/render"
+	"github.com/osifotos/price-checker/internal/usage"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 func (e *env) versionAction(c *cli.Context) error {

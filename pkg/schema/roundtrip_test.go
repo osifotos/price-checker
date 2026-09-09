@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema"
 	"pgregory.net/rapid"
 )
 

@@ -30,7 +30,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
         run: |
           V="${GITHUB_REF_NAME}"
-          P="github.com/mtosin123/tf-price_checker/internal/cli"
+          P="github.com/osifotos/price-checker/internal/cli"
           go build -trimpath \
             -ldflags "-s -w -X ${P}.version=${V} -X ${P}.commit=${GITHUB_SHA} -X ${P}.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             -o "price-checker-${GOOS}-${GOARCH}${{ matrix.ext }}" ./cmd/price-checker

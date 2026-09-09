@@ -1,4 +1,4 @@
-module github.com/mtosin123/tf-price_checker
+module github.com/osifotos/price-checker
 
 go 1.23
 

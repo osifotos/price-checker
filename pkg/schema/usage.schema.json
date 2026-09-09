@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/mtosin123/tf-price_checker/schema/usage.schema.json",
+  "$id": "https://github.com/osifotos/price-checker/schema/usage.schema.json",
   "title": "price-checker usage file",
   "type": "object",
   "additionalProperties": false,

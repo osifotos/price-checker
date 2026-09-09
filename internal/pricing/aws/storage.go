@@ -3,8 +3,8 @@ package aws
 import (
 	"context"
 
-	"github.com/mtosin123/tf-price_checker/internal/pricing"
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
+	"github.com/osifotos/price-checker/internal/pricing"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // ---- aws_s3_bucket ----

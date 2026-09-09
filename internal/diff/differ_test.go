@@ -4,8 +4,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/mtosin123/tf-price_checker/internal/diff"
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
+	"github.com/osifotos/price-checker/internal/diff"
+	"github.com/osifotos/price-checker/pkg/schema"
 	"pgregory.net/rapid"
 )
 

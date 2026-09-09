@@ -7,7 +7,7 @@ import (
 )
 
 // Build metadata, overridden by GoReleaser / the release workflow with
-// -ldflags "-X github.com/mtosin123/tf-price_checker/internal/cli.version=..."
+// -ldflags "-X github.com/osifotos/price-checker/internal/cli.version=..."
 var (
 	version = "dev"
 	commit  = "none"

@@ -9,11 +9,11 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/mtosin123/tf-price_checker/internal/engine"
-	"github.com/mtosin123/tf-price_checker/internal/plan"
-	"github.com/mtosin123/tf-price_checker/internal/pricing"
-	"github.com/mtosin123/tf-price_checker/internal/usage"
-	"github.com/mtosin123/tf-price_checker/pkg/schema"
+	"github.com/osifotos/price-checker/internal/engine"
+	"github.com/osifotos/price-checker/internal/plan"
+	"github.com/osifotos/price-checker/internal/pricing"
+	"github.com/osifotos/price-checker/internal/usage"
+	"github.com/osifotos/price-checker/pkg/schema"
 	"golang.org/x/sync/errgroup"
 )
 
