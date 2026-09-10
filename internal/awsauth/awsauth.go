@@ -39,6 +39,19 @@ func Load(ctx context.Context, profile, regionOverride string) (aws.Config, erro
 	return cfg, nil
 }
 
+// TargetRegion returns the AWS region we want to price in. This is the user's
+// configured / resolved region for the resources, not the endpoint the Price List
+// API is reached through.
+func TargetRegion(cfg aws.Config, override string) string {
+	if override != "" {
+		return override
+	}
+	if cfg.Region != "" {
+		return cfg.Region
+	}
+	return "us-east-1"
+}
+
 // PriceListRegion returns the region to send Price List API calls to. The Price
 // List API is only available in us-east-1 and ap-south-1; if the caller's
 // configured region is ap-south-1 that is used, otherwise us-east-1.

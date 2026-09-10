@@ -23,6 +23,7 @@ type Config struct {
 	UsageFile            string
 	AWSRegion            string
 	Profile              string
+	Live                 bool
 	CacheDir             string
 	CacheTTL             time.Duration
 	NoCache              bool
@@ -78,6 +79,7 @@ type fileConfig struct {
 	UsageFile            *string  `yaml:"usage_file"`
 	AWSRegion            *string  `yaml:"aws_region"`
 	Profile              *string  `yaml:"profile"`
+	Live                 *bool    `yaml:"live"`
 	CacheDir             *string  `yaml:"cache_dir"`
 	CacheTTL             *string  `yaml:"cache_ttl"`
 	NoCache              *bool    `yaml:"no_cache"`
@@ -176,6 +178,9 @@ func applyFile(cfg *Config, prov Provenance, fc fileConfig) {
 	if fc.Profile != nil {
 		set("profile", func() { cfg.Profile = *fc.Profile })
 	}
+	if fc.Live != nil {
+		set("live", func() { cfg.Live = *fc.Live })
+	}
 	if fc.CacheDir != nil {
 		set("cache-dir", func() { cfg.CacheDir = *fc.CacheDir })
 	}
@@ -261,6 +266,7 @@ func applyFlags(cfg *Config, prov Provenance, vals map[string]Raw) []string {
 	setS("usage-file", &cfg.UsageFile)
 	setS("aws-region", &cfg.AWSRegion)
 	setS("profile", &cfg.Profile)
+	setB("live", &cfg.Live)
 	setS("cache-dir", &cfg.CacheDir)
 	setD("cache-ttl", &cfg.CacheTTL)
 	setB("no-cache", &cfg.NoCache)
@@ -277,7 +283,7 @@ func applyFlags(cfg *Config, prov Provenance, vals map[string]Raw) []string {
 
 var fieldNames = map[string]struct{}{
 	"path": {}, "compare-to": {}, "from-plan": {}, "format": {}, "out": {}, "period": {},
-	"usage-file": {}, "aws-region": {}, "profile": {}, "cache-dir": {}, "cache-ttl": {},
+	"usage-file": {}, "aws-region": {}, "profile": {}, "live": {}, "cache-dir": {}, "cache-ttl": {},
 	"no-cache": {}, "refresh-cache": {}, "strict": {}, "threshold-monthly": {},
 	"threshold-diff-monthly": {}, "show-components": {}, "concurrency": {}, "log-level": {}, "no-color": {},
 }

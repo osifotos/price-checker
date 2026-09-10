@@ -66,6 +66,24 @@ func TestResolveNoFile(t *testing.T) {
 	}
 }
 
+func TestResolveLiveMode(t *testing.T) {
+	cfg, _, warns, err := Resolve(Inputs{Values: map[string]Raw{
+		"live": {Value: true, Set: true},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(warns) != 0 {
+		t.Fatalf("unexpected warnings: %v", warns)
+	}
+	if !cfg.Live {
+		t.Fatal("expected live mode to be enabled")
+	}
+	if cfg.Live && cfg.Format != "table" {
+		t.Fatalf("live mode should not change the default format: got %q", cfg.Format)
+	}
+}
+
 func TestResolveUnknownKeyWarns(t *testing.T) {
 	dir := t.TempDir()
 	p := filepath.Join(dir, "c.yml")

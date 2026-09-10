@@ -11,8 +11,12 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awspricing "github.com/aws/aws-sdk-go-v2/service/pricing"
+	pricingtypes "github.com/aws/aws-sdk-go-v2/service/pricing/types"
 	"github.com/urfave/cli/v2"
 
+	"github.com/osifotos/price-checker/internal/awsauth"
 	"github.com/osifotos/price-checker/internal/config"
 	"github.com/osifotos/price-checker/internal/diff"
 	"github.com/osifotos/price-checker/internal/estimator"
@@ -147,6 +151,48 @@ func (e *env) usageGenerateAction(c *cli.Context) error {
 		return err
 	}
 	return writeRendered(e, cfg, func(w io.Writer) error { return usage.GenerateSkeleton(pl, w) })
+}
+
+func (e *env) liveVerifyAction(c *cli.Context) error {
+	cfg, _, warns, err := resolveConfig(c, e.noColor())
+	if err != nil {
+		return err
+	}
+	log := newLogger(cfg.LogLevel, e.stderr)
+	logWarnings(log, warns)
+
+	if !cfg.Live {
+		return fmt.Errorf("live verification requires --live or PRICE_CHECKER_LIVE=1")
+	}
+
+	sdkCfg, err := awsauth.Load(c.Context, cfg.Profile, cfg.AWSRegion)
+	if err != nil {
+		return fmt.Errorf("load AWS config for live verification: %w", err)
+	}
+	endpointRegion := awsauth.PriceListRegion(sdkCfg)
+	targetRegion := awsauth.TargetRegion(sdkCfg, cfg.AWSRegion)
+
+	sdkCfg.Region = endpointRegion
+	api := awspricing.NewFromConfig(sdkCfg)
+
+	out, err := api.GetProducts(c.Context, &awspricing.GetProductsInput{
+		ServiceCode: aws.String("AmazonEC2"),
+		FormatVersion: aws.String("aws_v1"),
+		Filters: []pricingtypes.Filter{
+			{Type: pricingtypes.FilterTypeTermMatch, Field: aws.String("regionCode"), Value: aws.String(targetRegion)},
+			{Type: pricingtypes.FilterTypeTermMatch, Field: aws.String("instanceType"), Value: aws.String("m5.large")},
+		},
+		MaxResults: aws.Int32(10),
+	})
+	if err != nil {
+		return fmt.Errorf("live AWS Price List verification failed: %w", err)
+	}
+	if len(out.PriceList) == 0 {
+		return fmt.Errorf("live AWS Price List verification returned no products for AmazonEC2/m5.large in %s", targetRegion)
+	}
+
+	fmt.Fprintf(e.stdout, "live AWS verification OK: %d Price List products returned for AmazonEC2/m5.large in %s (API endpoint: %s)\n", len(out.PriceList), targetRegion, endpointRegion)
+	return nil
 }
 
 // ---- helpers ----
