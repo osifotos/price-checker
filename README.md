@@ -35,6 +35,22 @@ price-checker usage generate --path plan.json > infra-usage.yml
 AWS credentials come from the standard SDK chain (environment, shared config,
 `--profile`, SSO, instance role). The Price List API is USD-only; v1 shows USD.
 
+### Live AWS verification
+
+For real AWS Price List validation, opt in explicitly with `--live` or the
+`PRICE_CHECKER_LIVE=1` environment variable:
+
+```bash
+price-checker live-verify --live --aws-region us-east-1
+# or
+PRICE_CHECKER_LIVE=1 price-checker live-verify
+```
+
+This performs a minimal live `pricing:GetProducts` probe against the configured
+AWS region and fails clearly if credentials are missing or invalid. Normal runs
+remain offline by default, so you do not need AWS credentials for standard plan
+estimation.
+
 ### Key flags
 
 | Flag | Meaning |
@@ -46,6 +62,7 @@ AWS credentials come from the standard SDK chain (environment, shared config,
 | `--show-components, -v` | show per-resource cost components |
 | `--usage-file` | usage assumptions YAML (see below) |
 | `--aws-region` | override the region for every resource |
+| `--live` / `PRICE_CHECKER_LIVE` | opt in to a real AWS Price List verification query using configured credentials |
 | `--cache-dir` / `--cache-ttl` / `--no-cache` / `--refresh-cache` | on-disk price cache (default `~/.price-checker/cache`, 7-day TTL) |
 | `--strict` | exit 2 if anything could not be estimated |
 | `--threshold-monthly` / `--threshold-diff-monthly` | exit 3 if exceeded |
