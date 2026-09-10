@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -134,6 +135,9 @@ func TestCacheConcurrentWrites(t *testing.T) {
 }
 
 func TestCacheFilePerms(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows does not enforce POSIX permission bits the same way as Unix")
+	}
 	dir := t.TempDir()
 	c, _ := newTestCache(t, CacheOptions{Dir: dir})
 	if _, err := c.Query(context.Background(), testQuery); err != nil {

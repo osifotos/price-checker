@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -154,14 +155,15 @@ func (s *diskStore) put(key string, e cacheEntry) error {
 		_ = os.Remove(tmpName)
 		return err
 	}
-	if err := tmp.Chmod(0o600); err != nil {
-		_ = tmp.Close()
-		_ = os.Remove(tmpName)
-		return err
-	}
 	if err := tmp.Close(); err != nil {
 		_ = os.Remove(tmpName)
 		return err
+	}
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(tmpName, 0o600); err != nil {
+			_ = os.Remove(tmpName)
+			return err
+		}
 	}
 	if err := os.Rename(tmpName, p); err != nil {
 		_ = os.Remove(tmpName)

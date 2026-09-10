@@ -9,7 +9,7 @@ import (
 // Build metadata, overridden by GoReleaser / the release workflow with
 // -ldflags "-X github.com/osifotos/price-checker/internal/cli.version=..."
 var (
-	version = "dev"
+	version = "v0.1.4"
 	commit  = "none"
 	date    = "unknown"
 )
