@@ -176,7 +176,7 @@ func (e *env) liveVerifyAction(c *cli.Context) error {
 	api := awspricing.NewFromConfig(sdkCfg)
 
 	out, err := api.GetProducts(c.Context, &awspricing.GetProductsInput{
-		ServiceCode: aws.String("AmazonEC2"),
+		ServiceCode:   aws.String("AmazonEC2"),
 		FormatVersion: aws.String("aws_v1"),
 		Filters: []pricingtypes.Filter{
 			{Type: pricingtypes.FilterTypeTermMatch, Field: aws.String("regionCode"), Value: aws.String(targetRegion)},
