@@ -9,15 +9,74 @@ explicitly with a reason.
 > Status: v1 in development via the AI-DLC workflow (see `aidlc-docs/`). Build
 > requires Go 1.23+; run `go mod tidy` after cloning.
 
+## Requirements
+
+- Go 1.23+ installed
+- Terraform 1.x installed if you pass a Terraform directory instead of a pre-generated plan JSON
+- AWS credentials configured for live pricing or live verification
+- Access to the AWS Pricing API (`pricing:GetProducts`)
+
 ## Install
 
-Download a static binary from the releases page, or:
+### Option 1: install from Go
 
-```
+```bash
 go install github.com/osifotos/price-checker/cmd/price-checker@latest
 ```
 
-No runtime dependencies. `terraform` is only needed for directory input mode.
+If the binary is not found afterward, add Go's bin directory to your shell `PATH`:
+
+```bash
+# Linux / macOS
+export PATH="$(go env GOPATH)/bin:$PATH"
+
+# Windows PowerShell
+$env:Path += ";$(go env GOPATH)\bin"
+```
+
+### Option 2: download a release binary
+
+Download the matching binary from the GitHub Releases page for your OS/architecture.
+
+### Platform notes
+
+- Linux: works with the Go install path above
+- macOS: works with the Go install path above
+- Windows: works via Go install or the release binary; use PowerShell examples below
+
+No runtime dependencies are required for the default offline path. `terraform` is only needed when passing a Terraform directory instead of a plan JSON file.
+
+## Setup AWS credentials
+
+The tool uses the same AWS credential resolution as the AWS CLI. If you have
+already run `aws configure` or `aws sso login` in the terminal, and your AWS
+profile/region is already active, you usually do not need any extra setup.
+
+The AWS SDK will automatically use the active credential source, including:
+
+- environment variables
+- shared AWS config / credentials files
+- a named profile via `--profile`
+- SSO profiles after `aws sso login`
+- EC2 / ECS / Lambda / container role credentials
+
+Examples:
+
+```bash
+# Linux / macOS
+export AWS_PROFILE=my-profile
+export AWS_REGION=us-west-2
+
+# Windows PowerShell
+$env:AWS_PROFILE = "my-profile"
+$env:AWS_REGION = "us-west-2"
+```
+
+To verify AWS access before pricing a Terraform project:
+
+```bash
+price-checker live-verify --live --aws-region us-west-2
+```
 
 ## Usage
 
