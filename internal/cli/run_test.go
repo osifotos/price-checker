@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"strings"
 	"testing"
@@ -110,9 +111,39 @@ func TestRunEstimatorError(t *testing.T) {
 	}
 }
 
+type processExitError struct{}
+
+func (processExitError) Error() string { return "exit status 1" }
+func (processExitError) ExitCode() int { return ExitRuntimeErr }
+
+func TestRunWrappedProcessErrorShowsContext(t *testing.T) {
+	deps := &Deps{
+		NewEstimator: func(context.Context, config.Config, *slog.Logger) (Estimator, func(), error) {
+			return fakeEst{err: fmt.Errorf("terraform plan failed: backend initialization required: %w", processExitError{})}, func() {}, nil
+		},
+	}
+	_, errb, code := run(t, deps, "breakdown")
+	if code != ExitRuntimeErr {
+		t.Fatalf("expected exit 1, got %d", code)
+	}
+	if !strings.Contains(errb, "backend initialization required") {
+		t.Fatalf("wrapped process error context was hidden: %q", errb)
+	}
+}
+
+func TestVerboseEnablesDebugLogging(t *testing.T) {
+	_, errb, code := run(t, depsWith(schematest.SampleBreakdown()), "--verbose")
+	if code != ExitOK {
+		t.Fatalf("expected exit 0, got %d", code)
+	}
+	if !strings.Contains(errb, `log_level="debug (flag/env)"`) {
+		t.Fatalf("verbose did not enable debug logging: %q", errb)
+	}
+}
+
 func TestRunHelpListsFlagsAndExitCodes(t *testing.T) {
 	out, _, _ := run(t, &Deps{}, "--help")
-	for _, want := range []string{"--strict", "--threshold-monthly", "--format", "EXIT CODES", "  2  ", "  3  "} {
+	for _, want := range []string{"--strict", "--threshold-monthly", "--format", "--verbose", "EXIT CODES", "  2  ", "  3  "} {
 		if !strings.Contains(out, want) {
 			t.Errorf("help output missing %q", want)
 		}

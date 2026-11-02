@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,7 @@ import (
 type fakeRunner struct {
 	hasTerraform bool
 	planOutput   []byte
+	planStderr   []byte
 	showOutput   []byte
 	planErr      error
 	showErr      error
@@ -28,7 +30,7 @@ func (f *fakeRunner) run(ctx context.Context, dir string, args ...string) ([]byt
 	f.calls = append(f.calls, args)
 	switch args[0] {
 	case "plan":
-		return f.planOutput, []byte("plan stderr"), f.planErr
+		return f.planOutput, f.planStderr, f.planErr
 	case "show":
 		return f.showOutput, []byte("show stderr"), f.showErr
 	}
@@ -82,6 +84,23 @@ func TestLoaderDirNoTerraform(t *testing.T) {
 	_, _, err := l.Load(context.Background(), dir, nil)
 	if err == nil || !strings.Contains(err.Error(), "terraform") {
 		t.Fatalf("want terraform-not-found error, got %v", err)
+	}
+}
+
+func TestLoaderDirPlanFailureShowsTerraformDiagnostic(t *testing.T) {
+	dir := t.TempDir()
+	planOutput := []byte(`{"type":"diagnostic","diagnostic":{"severity":"error","summary":"Backend initialization required","detail":"Please run terraform init with -reconfigure."}}`)
+	fr := &fakeRunner{hasTerraform: true, planOutput: planOutput, planErr: errors.New("exit status 1")}
+	l := &fileLoader{run: fr}
+	_, _, err := l.Load(context.Background(), dir, nil)
+	if err == nil {
+		t.Fatal("expected plan error")
+	}
+	if !strings.Contains(err.Error(), "Backend initialization required") || !strings.Contains(err.Error(), "Please run terraform init with -reconfigure") {
+		t.Fatalf("Terraform diagnostic was hidden: %v", err)
+	}
+	if strings.Contains(err.Error(), `"type":"diagnostic"`) {
+		t.Fatalf("raw JSON diagnostic was not formatted: %v", err)
 	}
 }
 

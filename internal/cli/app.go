@@ -71,6 +71,7 @@ func globalFlags() []cli.Flag {
 		&cli.BoolFlag{Name: "show-components", Aliases: []string{"v"}, EnvVars: []string{"PRICE_CHECKER_SHOW_COMPONENTS"}, Usage: "show per-resource cost components"},
 		&cli.IntFlag{Name: "concurrency", EnvVars: []string{"PRICE_CHECKER_CONCURRENCY"}, Usage: "parallel pricing requests (default 8)"},
 		&cli.StringFlag{Name: "log-level", EnvVars: []string{"PRICE_CHECKER_LOG_LEVEL"}, Usage: "error | warn | info | debug"},
+		&cli.BoolFlag{Name: "verbose", EnvVars: []string{"PRICE_CHECKER_VERBOSE"}, Usage: "enable debug-level diagnostics"},
 		&cli.BoolFlag{Name: "no-color", EnvVars: []string{"NO_COLOR"}, Usage: "disable ANSI colour"},
 	}
 }
@@ -104,6 +105,10 @@ func resolveConfig(c *cli.Context, noColorForced bool) (config.Config, config.Pr
 	cfg, prov, warns, err := config.Resolve(config.Inputs{Values: vals, ConfigPath: c.String("config")})
 	if err != nil {
 		return config.Config{}, nil, nil, err
+	}
+	if c.Bool("verbose") && !c.IsSet("log-level") {
+		cfg.LogLevel = "debug"
+		prov["log-level"] = config.SourceFlag
 	}
 	if noColorForced {
 		cfg.NoColor = true

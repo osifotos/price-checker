@@ -4,7 +4,6 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -33,8 +32,7 @@ func runWithDeps(args []string, stdin io.Reader, stdout, stderr io.Writer, deps 
 		return ExitOK
 	}
 
-	var coder cli.ExitCoder
-	if errors.As(err, &coder) {
+	if coder, ok := err.(cli.ExitCoder); ok {
 		if msg := coder.Error(); msg != "" {
 			fmt.Fprintln(stderr, msg)
 		}

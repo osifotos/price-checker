@@ -121,6 +121,7 @@ estimation.
 | `--threshold-monthly` / `--threshold-diff-monthly` | exit 3 if exceeded |
 | `--concurrency` | parallel pricing requests (default 8) |
 | `--log-level` | `error` \| `warn` (default) \| `info` \| `debug` |
+| `--verbose` / `PRICE_CHECKER_VERBOSE` | enable debug logging and detailed Terraform diagnostics |
 | `--config` | config file (default `./price-checker.yml`) |
 
 All flags can be set via `PRICE_CHECKER_*` env vars or the config file.

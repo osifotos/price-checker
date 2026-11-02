@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -65,4 +66,33 @@ func terraformDeprecations(raw []byte) []TerraformDeprecation {
 		return out[i].Summary < out[j].Summary
 	})
 	return out
+}
+
+func terraformPlanError(stdout, stderr []byte) []byte {
+	if len(bytes.TrimSpace(stderr)) > 0 {
+		return stderr
+	}
+	var messages []string
+	for _, line := range bytes.Split(stdout, []byte{'\n'}) {
+		var event terraformUIEvent
+		if json.Unmarshal(line, &event) != nil || event.Type != "diagnostic" || event.Diagnostic.Severity != "error" {
+			continue
+		}
+		message := strings.TrimSpace(event.Diagnostic.Summary)
+		if detail := strings.TrimSpace(event.Diagnostic.Detail); detail != "" && detail != message {
+			message += ": " + detail
+		}
+		if event.Diagnostic.Range != nil && event.Diagnostic.Range.Filename != "" {
+			message += " (" + event.Diagnostic.Range.Filename
+			if event.Diagnostic.Range.Start.Line > 0 {
+				message += ":" + strconv.Itoa(event.Diagnostic.Range.Start.Line)
+			}
+			message += ")"
+		}
+		messages = append(messages, message)
+	}
+	if len(messages) > 0 {
+		return []byte(strings.Join(messages, "\n"))
+	}
+	return stdout
 }

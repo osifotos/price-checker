@@ -97,13 +97,6 @@ func (l *fileLoader) loadFromDir(ctx context.Context, dir string) ([]byte, []Ter
 	return stdout, terraformDeprecations(planOutput), nil
 }
 
-func terraformPlanError(stdout, stderr []byte) []byte {
-	if len(bytes.TrimSpace(stderr)) > 0 {
-		return stderr
-	}
-	return stdout
-}
-
 func trimStderr(b []byte) string {
 	s := string(bytes.TrimSpace(b))
 	const max = 2000
