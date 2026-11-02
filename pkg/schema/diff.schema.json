@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/osifotos/tfPrice_estimator/schema/diff.schema.json",
+  "$id": "https://github.com/osifotos/price-checker/schema/diff.schema.json",
   "title": "price-checker diff",
   "type": "object",
   "additionalProperties": false,

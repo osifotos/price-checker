@@ -6,7 +6,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/osifotos/tfPrice_estimator/internal/plan"
+	"github.com/osifotos/price-checker/internal/plan"
 )
 
 // GenerateSkeleton writes a starter usage YAML to w listing every usage-based

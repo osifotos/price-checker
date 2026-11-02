@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // ---- money formatting (the only place money is formatted in this unit) ----

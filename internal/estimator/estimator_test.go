@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/osifotos/tfPrice_estimator/internal/engine"
-	"github.com/osifotos/tfPrice_estimator/internal/plan"
-	"github.com/osifotos/tfPrice_estimator/internal/pricing"
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/internal/engine"
+	"github.com/osifotos/price-checker/internal/plan"
+	"github.com/osifotos/price-checker/internal/pricing"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // ---- fakes ----

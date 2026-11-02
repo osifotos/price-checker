@@ -16,13 +16,13 @@ import (
 	pricingtypes "github.com/aws/aws-sdk-go-v2/service/pricing/types"
 	"github.com/urfave/cli/v2"
 
-	"github.com/osifotos/tfPrice_estimator/internal/awsauth"
-	"github.com/osifotos/tfPrice_estimator/internal/config"
-	"github.com/osifotos/tfPrice_estimator/internal/diff"
-	"github.com/osifotos/tfPrice_estimator/internal/estimator"
-	"github.com/osifotos/tfPrice_estimator/internal/render"
-	"github.com/osifotos/tfPrice_estimator/internal/usage"
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/internal/awsauth"
+	"github.com/osifotos/price-checker/internal/config"
+	"github.com/osifotos/price-checker/internal/diff"
+	"github.com/osifotos/price-checker/internal/estimator"
+	"github.com/osifotos/price-checker/internal/render"
+	"github.com/osifotos/price-checker/internal/usage"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 func (e *env) versionAction(c *cli.Context) error {

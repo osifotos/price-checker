@@ -3,8 +3,8 @@ package aws
 import (
 	"context"
 
-	"github.com/osifotos/tfPrice_estimator/internal/pricing"
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/internal/pricing"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // ---- aws_sqs_queue ----

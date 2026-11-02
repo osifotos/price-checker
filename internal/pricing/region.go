@@ -1,6 +1,6 @@
 package pricing
 
-import "github.com/osifotos/tfPrice_estimator/internal/plan"
+import "github.com/osifotos/price-checker/internal/plan"
 
 // RegionResolver decides which AWS region a resource is priced in.
 type RegionResolver struct{}

@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"sort"
 
-	"github.com/osifotos/tfPrice_estimator/internal/plan"
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/internal/plan"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // PricedResource is one resource after its pricer has run.

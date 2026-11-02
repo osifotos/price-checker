@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 type ghRenderer struct{}

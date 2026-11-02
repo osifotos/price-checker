@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/osifotos/tfPrice_estimator/internal/plan"
+	"github.com/osifotos/price-checker/internal/plan"
 )
 
 func mkPlan(resources ...plan.Resource) *plan.Plan {

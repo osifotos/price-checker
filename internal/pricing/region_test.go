@@ -3,7 +3,7 @@ package pricing
 import (
 	"testing"
 
-	"github.com/osifotos/tfPrice_estimator/internal/plan"
+	"github.com/osifotos/price-checker/internal/plan"
 )
 
 func TestRegionResolver(t *testing.T) {

@@ -23,13 +23,13 @@ explicitly with a reason.
 For a publicly readable GitHub repository, install directly:
 
 ```bash
-go install github.com/osifotos/tfPrice_estimator/cmd/price-checker@latest
+go install github.com/osifotos/price-checker/cmd/price-checker@latest
 ```
 
 If the repository is private, configure GitHub authentication first and set `GOPRIVATE=github.com/osifotos` so Go bypasses the public module proxy for this module.
 ### Option 2: download a release binary
 
-Download the matching binary from the [GitHub Releases page](https://github.com/osifotos/tfPrice_estimator/releases) for your OS/architecture.
+Download the matching binary from the [GitHub Releases page](https://github.com/osifotos/price-checker/releases) for your OS/architecture.
 
 ### Platform notes
 

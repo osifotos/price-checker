@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"sort"
 
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // Differ computes cost diffs.

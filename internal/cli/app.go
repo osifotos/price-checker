@@ -5,7 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/osifotos/tfPrice_estimator/internal/config"
+	"github.com/osifotos/price-checker/internal/config"
 )
 
 type env struct {

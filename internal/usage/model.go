@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/price-checker/pkg/schema"
 )
 
 // Model exposes usage assumptions to pricers.
