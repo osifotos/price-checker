@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // ---- money formatting (the only place money is formatted in this unit) ----
@@ -88,6 +88,7 @@ type htmlVM struct {
 	Modules       []htmlModule
 	Resources     []htmlResource
 	NotEstimated  []schema.NotEstimated
+	Deprecations  []schema.Deprecation
 	Changes       []htmlChange
 	Meta          schema.RunMetadata
 }
@@ -131,6 +132,7 @@ func breakdownVM(b *schema.Breakdown) htmlVM {
 		TotalMonthly: money2(b.TotalMonthly),
 		TotalHourly:  rate4(b.TotalHourly),
 		NotEstimated: b.NotEstimated,
+		Deprecations: b.Deprecations,
 		Meta:         b.Metadata,
 	}
 	for _, m := range b.Modules {
@@ -162,6 +164,7 @@ func diffVM(d *schema.DiffResult) htmlVM {
 		Title:         "Cost change",
 		Currency:      d.Currency,
 		DeltaHeadline: signed2(d.TotalDeltaMonthly) + " / month  (" + money2(d.TotalPriorMonthly) + " → " + money2(d.TotalNewMonthly) + ")",
+		Deprecations:  d.Deprecations,
 		Meta:          d.Metadata,
 	}
 	for _, c := range d.Changes {

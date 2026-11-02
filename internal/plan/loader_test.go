@@ -10,6 +10,7 @@ import (
 
 type fakeRunner struct {
 	hasTerraform bool
+	planOutput   []byte
 	showOutput   []byte
 	planErr      error
 	showErr      error
@@ -27,7 +28,7 @@ func (f *fakeRunner) run(ctx context.Context, dir string, args ...string) ([]byt
 	f.calls = append(f.calls, args)
 	switch args[0] {
 	case "plan":
-		return nil, []byte("plan stderr"), f.planErr
+		return f.planOutput, []byte("plan stderr"), f.planErr
 	case "show":
 		return f.showOutput, []byte("show stderr"), f.showErr
 	}
@@ -86,7 +87,8 @@ func TestLoaderDirNoTerraform(t *testing.T) {
 
 func TestLoaderDirSuccess(t *testing.T) {
 	dir := t.TempDir()
-	fr := &fakeRunner{hasTerraform: true, showOutput: []byte(`{"format_version":"1.2"}`)}
+	planOutput := []byte("{\"type\":\"diagnostic\",\"diagnostic\":{\"severity\":\"warning\",\"summary\":\"Deprecated resource\",\"detail\":\"aws_old_resource is deprecated; use aws_new_resource\",\"range\":{\"filename\":\"main.tf\",\"start\":{\"line\":7}}}}\n")
+	fr := &fakeRunner{hasTerraform: true, planOutput: planOutput, showOutput: []byte(`{"format_version":"1.2"}`)}
 	l := &fileLoader{run: fr}
 	b, info, err := l.Load(context.Background(), dir, nil)
 	if err != nil {
@@ -95,7 +97,13 @@ func TestLoaderDirSuccess(t *testing.T) {
 	if info.Mode != "dir" || string(b) != `{"format_version":"1.2"}` {
 		t.Fatalf("bad result: %q %+v", b, info)
 	}
+	if len(info.Deprecations) != 1 || info.Deprecations[0].Filename != "main.tf" || info.Deprecations[0].Line != 7 {
+		t.Fatalf("deprecation diagnostic not captured: %+v", info.Deprecations)
+	}
 	if len(fr.calls) != 2 || fr.calls[0][0] != "plan" || fr.calls[1][0] != "show" {
 		t.Fatalf("unexpected terraform calls: %v", fr.calls)
+	}
+	if len(fr.calls[0]) < 3 || fr.calls[0][1] != "-json" {
+		t.Fatalf("plan did not enable machine-readable output: %v", fr.calls[0])
 	}
 }

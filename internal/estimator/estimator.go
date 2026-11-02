@@ -9,11 +9,12 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/osifotos/price-checker/internal/engine"
-	"github.com/osifotos/price-checker/internal/plan"
-	"github.com/osifotos/price-checker/internal/pricing"
-	"github.com/osifotos/price-checker/internal/usage"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/deprecation"
+	"github.com/osifotos/tfPrice_estimator/internal/engine"
+	"github.com/osifotos/tfPrice_estimator/internal/plan"
+	"github.com/osifotos/tfPrice_estimator/internal/pricing"
+	"github.com/osifotos/tfPrice_estimator/internal/usage"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -33,12 +34,13 @@ type Deps struct {
 
 // EstimateRequest is one estimation.
 type EstimateRequest struct {
-	Source         string
-	Stdin          io.Reader
-	RegionOverride string
-	UsagePath      string
-	Concurrency    int
-	Period         schema.Period
+	Source           string
+	Stdin            io.Reader
+	RegionOverride   string
+	UsagePath        string
+	DeprecationsPath string
+	Concurrency      int
+	Period           schema.Period
 }
 
 // Estimator turns a plan source into a schema.Breakdown.
@@ -59,7 +61,7 @@ func New(d Deps) *Estimator {
 
 // Estimate runs the full pipeline for the planned state.
 func (e *Estimator) Estimate(ctx context.Context, req EstimateRequest) (*schema.Breakdown, error) {
-	pl, um, err := e.loadPlanAndUsage(ctx, req)
+	pl, um, findings, err := e.loadPlanAndUsage(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -67,13 +69,16 @@ func (e *Estimator) Estimate(ctx context.Context, req EstimateRequest) (*schema.
 	if err != nil {
 		return nil, err
 	}
-	return e.d.Agg.Build(priced, e.metadata(pl, um), period(req.Period)), nil
+	b := e.d.Agg.Build(priced, e.metadata(pl, um), period(req.Period))
+	b.Deprecations = findings
+	b.Canonicalize()
+	return b, nil
 }
 
 // EstimateBothStates prices the prior and planned states from a single plan,
 // reusing the querier so the second pass runs against a warm cache.
 func (e *Estimator) EstimateBothStates(ctx context.Context, req EstimateRequest) (prior, planned *schema.Breakdown, err error) {
-	pl, um, err := e.loadPlanAndUsage(ctx, req)
+	pl, um, findings, err := e.loadPlanAndUsage(ctx, req)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -86,22 +91,31 @@ func (e *Estimator) EstimateBothStates(ctx context.Context, req EstimateRequest)
 		return nil, nil, err
 	}
 	meta := e.metadata(pl, um)
-	return e.d.Agg.Build(priorPriced, meta, period(req.Period)),
-		e.d.Agg.Build(plannedPriced, meta, period(req.Period)), nil
+	prior = e.d.Agg.Build(priorPriced, meta, period(req.Period))
+	planned = e.d.Agg.Build(plannedPriced, meta, period(req.Period))
+	prior.Deprecations = findings
+	planned.Deprecations = findings
+	prior.Canonicalize()
+	planned.Canonicalize()
+	return prior, planned, nil
 }
 
-func (e *Estimator) loadPlanAndUsage(ctx context.Context, req EstimateRequest) (*plan.Plan, usage.Model, error) {
-	raw, _, err := e.d.Loader.Load(ctx, req.Source, req.Stdin)
+func (e *Estimator) loadPlanAndUsage(ctx context.Context, req EstimateRequest) (*plan.Plan, usage.Model, []schema.Deprecation, error) {
+	raw, info, err := e.d.Loader.Load(ctx, req.Source, req.Stdin)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	pl, err := e.d.Parser.Parse(raw)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	um, err := usage.Load(req.UsagePath)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+	findings, err := deprecation.Find(pl.Resources(), info.Deprecations, req.DeprecationsPath)
+	if err != nil {
+		return nil, nil, nil, err
 	}
 	addrs := map[string]bool{}
 	for _, r := range pl.AllResources() {
@@ -111,7 +125,7 @@ func (e *Estimator) loadPlanAndUsage(ctx context.Context, req EstimateRequest) (
 	for _, w := range um.Warnings() {
 		e.d.Log.Warn(w)
 	}
-	return pl, um, nil
+	return pl, um, findings, nil
 }
 
 func (e *Estimator) priceAll(ctx context.Context, pl *plan.Plan, resources []plan.Resource, um usage.Model, req EstimateRequest, prior bool) ([]engine.PricedResource, error) {

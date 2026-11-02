@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/osifotos/price-checker/internal/render"
-	"github.com/osifotos/price-checker/pkg/schema"
-	"github.com/osifotos/price-checker/pkg/schema/schematest"
+	"github.com/osifotos/tfPrice_estimator/internal/render"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema/schematest"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 )
 
@@ -117,6 +117,34 @@ func TestGitHubCommentRenderer(t *testing.T) {
 	}
 }
 
+func TestDeprecationsRenderAcrossFormats(t *testing.T) {
+	b := schematest.SampleBreakdown()
+	b.Deprecations = []schema.Deprecation{{
+		Address: "aws_launch_configuration.old", Type: "aws_launch_configuration",
+		Source: "aws-lifecycle", Message: "Migrate this resource.",
+		Replacement: "aws_launch_template", EffectiveDate: "2024-10-01",
+	}}
+	b.Canonicalize()
+
+	for format, want := range map[string]string{
+		"table":          "DEPRECATIONS (1)",
+		"json":           `"source": "aws-lifecycle"`,
+		"html":           "Deprecated resources (1)",
+		"github-comment": "**Deprecated resources**",
+	} {
+		var buf bytes.Buffer
+		if err := mustRenderer(t, format).Render(&buf, b, render.Options{}); err != nil {
+			t.Fatalf("%s render: %v", format, err)
+		}
+		if !strings.Contains(buf.String(), want) || !strings.Contains(buf.String(), "aws_launch_configuration.old") {
+			t.Errorf("%s output did not include the deprecation finding:\n%s", format, buf.String())
+		}
+		if format == "json" {
+			compileAndValidate(t, schema.BreakdownSchemaJSON, buf.Bytes())
+		}
+	}
+}
+
 func TestDiffRenderers(t *testing.T) {
 	d := schematest.SampleDiff()
 	for _, f := range []string{"table", "json", "html", "github-comment"} {
@@ -132,6 +160,23 @@ func TestDiffRenderers(t *testing.T) {
 			t.Errorf("%s produced empty diff output", f)
 		}
 	}
+}
+
+func TestDiffJSONDeprecationsValidateAgainstSchema(t *testing.T) {
+	d := schematest.SampleDiff()
+	d.Deprecations = []schema.Deprecation{{
+		Address: "aws_launch_configuration.old", Type: "aws_launch_configuration",
+		Source: "aws-lifecycle", Message: "Migrate this resource.",
+	}}
+	var buf bytes.Buffer
+	_, renderer, err := render.RendererFor("json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := renderer.RenderDiff(&buf, d, render.Options{}); err != nil {
+		t.Fatal(err)
+	}
+	compileAndValidate(t, schema.DiffSchemaJSON, buf.Bytes())
 }
 
 func mustRenderer(t *testing.T, f string) render.Renderer {

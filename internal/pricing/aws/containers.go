@@ -4,8 +4,8 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/osifotos/price-checker/internal/pricing"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/pricing"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // ---- aws_eks_cluster ----

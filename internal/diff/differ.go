@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"sort"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // Differ computes cost diffs.
@@ -84,6 +84,7 @@ func (Differ) Diff(base, proposed *schema.Breakdown) *schema.DiffResult {
 	d.TotalDeltaMonthly = schema.RatToString(totalDelta, 4)
 	d.TotalDeltaHourly = schema.RatToString(totalDeltaHourly, 4)
 	d.Summary = summary
+	d.Deprecations = append([]schema.Deprecation(nil), proposed.Deprecations...)
 	d.Metadata = proposed.Metadata
 
 	d.Canonicalize()

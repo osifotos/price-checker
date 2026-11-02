@@ -3,7 +3,7 @@ package schema_test
 import (
 	"testing"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 func TestReasonCodeValid(t *testing.T) {

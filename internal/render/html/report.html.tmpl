@@ -71,6 +71,22 @@
 </table>
 {{end}}
 
+{{if .Deprecations}}
+<h2>Deprecated resources ({{len .Deprecations}})</h2>
+<table>
+  <thead><tr><th>Resource</th><th>Source</th><th>Finding</th></tr></thead>
+  <tbody>
+  {{range .Deprecations}}
+    <tr>
+      <td><code>{{if .Address}}{{.Address}}{{else if .Type}}{{.Type}}{{else}}Terraform{{end}}</code></td>
+      <td>{{.Source}}</td>
+      <td>{{.Message}}{{if .Replacement}} Replacement: <code>{{.Replacement}}</code>.{{end}}{{if .EffectiveDate}} Effective {{.EffectiveDate}}.{{end}}{{if .Filename}} ({{.Filename}}:{{.Line}}){{end}}{{if .Reference}} <a href="{{.Reference}}">Reference</a>{{end}}</td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{end}}
+
 {{if .NotEstimated}}
 <h2>Not estimated ({{len .NotEstimated}})</h2>
 <table>

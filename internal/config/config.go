@@ -21,6 +21,7 @@ type Config struct {
 	Out                  string
 	Period               string
 	UsageFile            string
+	DeprecationsFile     string
 	AWSRegion            string
 	Profile              string
 	Live                 bool
@@ -77,6 +78,7 @@ type fileConfig struct {
 	Out                  *string  `yaml:"out"`
 	Period               *string  `yaml:"period"`
 	UsageFile            *string  `yaml:"usage_file"`
+	DeprecationsFile     *string  `yaml:"deprecations_file"`
 	AWSRegion            *string  `yaml:"aws_region"`
 	Profile              *string  `yaml:"profile"`
 	Live                 *bool    `yaml:"live"`
@@ -172,6 +174,9 @@ func applyFile(cfg *Config, prov Provenance, fc fileConfig) {
 	if fc.UsageFile != nil {
 		set("usage-file", func() { cfg.UsageFile = *fc.UsageFile })
 	}
+	if fc.DeprecationsFile != nil {
+		set("deprecations-file", func() { cfg.DeprecationsFile = *fc.DeprecationsFile })
+	}
 	if fc.AWSRegion != nil {
 		set("aws-region", func() { cfg.AWSRegion = *fc.AWSRegion })
 	}
@@ -264,6 +269,7 @@ func applyFlags(cfg *Config, prov Provenance, vals map[string]Raw) []string {
 	setS("out", &cfg.Out)
 	setS("period", &cfg.Period)
 	setS("usage-file", &cfg.UsageFile)
+	setS("deprecations-file", &cfg.DeprecationsFile)
 	setS("aws-region", &cfg.AWSRegion)
 	setS("profile", &cfg.Profile)
 	setB("live", &cfg.Live)
@@ -283,7 +289,7 @@ func applyFlags(cfg *Config, prov Provenance, vals map[string]Raw) []string {
 
 var fieldNames = map[string]struct{}{
 	"path": {}, "compare-to": {}, "from-plan": {}, "format": {}, "out": {}, "period": {},
-	"usage-file": {}, "aws-region": {}, "profile": {}, "live": {}, "cache-dir": {}, "cache-ttl": {},
+	"usage-file": {}, "deprecations-file": {}, "aws-region": {}, "profile": {}, "live": {}, "cache-dir": {}, "cache-ttl": {},
 	"no-cache": {}, "refresh-cache": {}, "strict": {}, "threshold-monthly": {},
 	"threshold-diff-monthly": {}, "show-components": {}, "concurrency": {}, "log-level": {}, "no-color": {},
 }

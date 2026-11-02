@@ -6,8 +6,8 @@ against), prices the AWS resources against the **live AWS Price List API**, and
 prints a monthly + hourly USD estimate. Anything it cannot price is listed
 explicitly with a reason.
 
-> Status: v1 in development via the AI-DLC workflow (see `aidlc-docs/`). Build
-> requires Go 1.23+; run `go mod tidy` after cloning.
+> Status: v1 in development. Build requires Go 1.23+; run `go mod tidy` after
+> cloning.
 
 ## Requirements
 
@@ -20,23 +20,16 @@ explicitly with a reason.
 
 ### Option 1: install from Go
 
-```bash
-go install github.com/osifotos/price-checker/cmd/price-checker@latest
-```
-
-If the binary is not found afterward, add Go's bin directory to your shell `PATH`:
+For a publicly readable GitHub repository, install directly:
 
 ```bash
-# Linux / macOS
-export PATH="$(go env GOPATH)/bin:$PATH"
-
-# Windows PowerShell
-$env:Path += ";$(go env GOPATH)\bin"
+go install github.com/osifotos/tfPrice_estimator/cmd/price-checker@latest
 ```
 
+If the repository is private, configure GitHub authentication first and set `GOPRIVATE=github.com/osifotos` so Go bypasses the public module proxy for this module.
 ### Option 2: download a release binary
 
-Download the matching binary from the GitHub Releases page for your OS/architecture.
+Download the matching binary from the [GitHub Releases page](https://github.com/osifotos/tfPrice_estimator/releases) for your OS/architecture.
 
 ### Platform notes
 
@@ -120,6 +113,7 @@ estimation.
 | `--period` | `month` (default) or `hour` |
 | `--show-components, -v` | show per-resource cost components |
 | `--usage-file` | usage assumptions YAML (see below) |
+| `--deprecations-file` | AWS lifecycle rules YAML (extends or overrides bundled rules) |
 | `--aws-region` | override the region for every resource |
 | `--live` / `PRICE_CHECKER_LIVE` | opt in to a real AWS Price List verification query using configured credentials |
 | `--cache-dir` / `--cache-ttl` / `--no-cache` / `--refresh-cache` | on-disk price cache (default `~/.price-checker/cache`, 7-day TTL) |
@@ -131,6 +125,38 @@ estimation.
 
 All flags can be set via `PRICE_CHECKER_*` env vars or the config file.
 Precedence: **flag / env > config file > default**.
+
+## Deprecation checks
+
+Directory scans capture Terraform provider deprecation diagnostics from
+`terraform plan -json`. Pre-generated plan JSON and stdin do not contain those
+diagnostics, but AWS lifecycle checks still run. Findings appear separately in
+reports and do not affect pricing totals or `--strict` exit behavior.
+
+The bundled AWS lifecycle catalog currently flags `aws_launch_configuration`.
+AWS states that accounts created on or after October 1, 2024 cannot create new
+launch configurations and recommends migrating to launch templates. Rules can
+be added or overridden with `--deprecations-file`:
+
+```yaml
+resources:
+  aws_launch_configuration:
+    message: "Migrate this resource to launch templates."
+    replacement: aws_launch_template
+    effective_date: "2024-10-01"
+    reference: https://docs.aws.amazon.com/autoscaling/ec2/userguide/launch-configurations.html
+  aws_example_resource:
+    message: "This AWS resource is scheduled for retirement."
+    replacement: aws_replacement_resource
+    effective_date: "2027-01-01"
+```
+
+Use the rules file with either a Terraform directory or plan JSON:
+
+```bash
+price-checker --path ./infra --deprecations-file lifecycle.yml
+price-checker --path plan.json --deprecations-file lifecycle.yml --format json
+```
 
 ## Exit codes
 
@@ -212,6 +238,8 @@ The minimum IAM permission is `pricing:GetProducts` (read-only).
 ```
 
 ## Scope (v1)
+
+See [AWS_RESOURCE_SUPPORT.md](AWS_RESOURCE_SUPPORT.md) for the complete matrix of supported resources, usage keys, non-billable types, and unsupported resources.
 
 AWS only. Priced: EC2, EBS (+snapshots, EIP/public IPv4), RDS + Aurora,
 ElastiCache, DynamoDB (provisioned), S3, Lambda, ALB/NLB/CLB, NAT Gateway, EKS

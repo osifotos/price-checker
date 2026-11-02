@@ -1,6 +1,6 @@
 package cli
 
-import "github.com/osifotos/price-checker/internal/config"
+import "github.com/osifotos/tfPrice_estimator/internal/config"
 
 // Exit codes. Stable across patch releases and documented in --help / README.
 const (

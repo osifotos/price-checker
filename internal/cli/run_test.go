@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/osifotos/price-checker/internal/config"
-	"github.com/osifotos/price-checker/internal/estimator"
-	"github.com/osifotos/price-checker/pkg/schema"
-	"github.com/osifotos/price-checker/pkg/schema/schematest"
+	"github.com/osifotos/tfPrice_estimator/internal/config"
+	"github.com/osifotos/tfPrice_estimator/internal/estimator"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema/schematest"
 )
 
 type fakeEst struct {

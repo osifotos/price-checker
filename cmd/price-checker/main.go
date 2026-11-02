@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/osifotos/price-checker/internal/cli"
+	"github.com/osifotos/tfPrice_estimator/internal/cli"
 )
 
 func main() {

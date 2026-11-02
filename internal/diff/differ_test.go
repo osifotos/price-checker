@@ -4,8 +4,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/osifotos/price-checker/internal/diff"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/diff"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 	"pgregory.net/rapid"
 )
 
@@ -68,6 +68,23 @@ func TestDiffNotEstimatedCarried(t *testing.T) {
 	}
 	if d.Changes[0].DeltaMonthly != "0" {
 		t.Errorf("not-estimated delta should be 0, got %q", d.Changes[0].DeltaMonthly)
+	}
+}
+
+func TestDiffCarriesProposedDeprecations(t *testing.T) {
+	base := bd("1.0000", r("x", "1.0000", 1))
+	proposed := bd("1.0000", r("x", "1.0000", 1))
+	proposed.Deprecations = []schema.Deprecation{{
+		Address: "aws_launch_configuration.old", Type: "aws_launch_configuration",
+		Source: "aws-lifecycle", Message: "Migrate this resource.",
+	}}
+
+	d := diff.Differ{}.Diff(base, proposed)
+	if len(d.Deprecations) != 1 || d.Deprecations[0].Address != "aws_launch_configuration.old" {
+		t.Fatalf("proposed deprecations not carried to diff: %+v", d.Deprecations)
+	}
+	if d.TotalDeltaMonthly != "0.0000" {
+		t.Fatalf("deprecation changed cost delta: %s", d.TotalDeltaMonthly)
 	}
 }
 

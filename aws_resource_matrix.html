@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Resource Support Matrix - price-checker</title>
+  <style>
+    :root {
+      --primary: #232f3e;
+      --secondary: #ff9900;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+
+      --badge-supported-bg: #d1fae5;
+      --badge-supported-text: #065f46;
+      --badge-usage-bg: #fef3c7;
+      --badge-usage-text: #92400e;
+      --badge-free-bg: #e0e7ff;
+      --badge-free-text: #3730a3;
+      --badge-unsupported-bg: #fee2e2;
+      --badge-unsupported-text: #991b1b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      margin: 0;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 32px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      color: var(--primary);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      padding: 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #fafafa;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .card-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card.supported { border-left: 4px solid #10b981; }
+    .card.supported .card-title { color: #065f46; }
+    .card.usage { border-left: 4px solid #f59e0b; }
+    .card.usage .card-title { color: #92400e; }
+    .card.free { border-left: 4px solid #6366f1; }
+    .card.free .card-title { color: #3730a3; }
+    .card.unsupported { border-left: 4px solid #ef4444; }
+    .card.unsupported .card-title { color: #991b1b; }
+
+    .search-filter {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.2);
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    thead {
+      background-color: #f9fafb;
+      position: sticky;
+      top: 0;
+    }
+
+    th {
+      padding: 12px 16px;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:hover {
+      background-color: #fcfcfc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+    }
+
+    .badge-supported {
+      background-color: var(--badge-supported-bg);
+      color: var(--badge-supported-text);
+    }
+
+    .badge-usage {
+      background-color: var(--badge-usage-bg);
+      color: var(--badge-usage-text);
+    }
+
+    .badge-free {
+      background-color: var(--badge-free-bg);
+      color: var(--badge-free-text);
+    }
+
+    .badge-unsupported {
+      background-color: var(--badge-unsupported-bg);
+      color: var(--badge-unsupported-text);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12.5px;
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #111827;
+    }
+
+    .notes {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .export-bar {
+      margin-top: 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .print-btn {
+      padding: 8px 16px;
+      background: var(--secondary);
+      color: #111827;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .print-btn:hover {
+      background: #e68a00;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; padding: 0; max-width: 100%; }
+      .search-filter, .export-bar { display: none; }
+      th, td { padding: 8px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>AWS Resource Support & Cost Estimation Matrix</h1>
+    <p class="subtitle">Executive Status Report for Terraform AWS Cost Estimation (v1)</p>
+  </header>
+
+  <div class="summary-cards">
+    <div class="card supported">
+      <div class="card-title">Supported Directly</div>
+      <div class="card-value">11 Resources</div>
+      <div class="card-desc">Priced automatically from Terraform plan attributes</div>
+    </div>
+    <div class="card usage">
+      <div class="card-title">Usage-Based</div>
+      <div class="card-value">10 Resources</div>
+      <div class="card-desc">Requires monthly assumptions via <code>--usage-file</code></div>
+    </div>
+    <div class="card free">
+      <div class="card-title">Non-Billable ($0.00)</div>
+      <div class="card-value">14 Resources</div>
+      <div class="card-desc">Native $0.00 AWS config (IAM, VPC, Subnets)</div>
+    </div>
+    <div class="card unsupported">
+      <div class="card-title">Not in Catalog</div>
+      <div class="card-value">1,400+ Resources</div>
+      <div class="card-desc">Surfaced as <code>UNSUPPORTED_TYPE</code> in breakdown</div>
+    </div>
+  </div>
+
+  <div class="search-filter">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search resources, service categories, or status (e.g. aws_instance, lambda, S3)..." onkeyup="filterTable()">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('SUPPORTED', this)">Supported</button>
+    <button class="filter-btn" onclick="setFilter('USAGE_FILE_NEEDED', this)">Usage File Needed</button>
+    <button class="filter-btn" onclick="setFilter('NOT_BILLABLE', this)">Non-Billable ($0)</button>
+    <button class="filter-btn" onclick="setFilter('NOT_SUPPORTED', this)">Unsupported</button>
+  </div>
+
+  <table id="resourceTable">
+    <thead>
+      <tr>
+        <th>Category / Domain</th>
+        <th>Terraform Resource Type</th>
+        <th>Support Status</th>
+        <th>Usage File Needed?</th>
+        <th>Pricing Behavior / Parameters</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- SUPPORTED DIRECTLY -->
+      <tr data-status="SUPPORTED">
+        <td>Compute</td>
+        <td><code>aws_instance</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from <code>instance_type</code>, root block device, public IPv4.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Storage</td>
+        <td><code>aws_ebs_volume</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from volume type (<code>gp2</code>, <code>gp3</code>, <code>io1</code>, <code>io2</code>, <code>st1</code>, <code>sc1</code>, <code>standard</code>), size GB, provisioned IOPS & throughput.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Networking</td>
+        <td><code>aws_eip</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Standard hourly IPv4 address pricing.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Containers</td>
+        <td><code>aws_eks_cluster</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">EKS control plane cluster hourly rate ($0.10/hr).</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Containers</td>
+        <td><code>aws_eks_node_group</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from <code>instance_types</code>, <code>scaling_config.desired_size</code>, and attached EBS disk size.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Database</td>
+        <td><code>aws_db_instance</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from <code>instance_class</code>, allocated storage, storage engine, multi-AZ deployment.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Database</td>
+        <td><code>aws_rds_cluster_instance</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from DB instance class size.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Database / Cache</td>
+        <td><code>aws_elasticache_cluster</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from <code>node_type</code> and <code>num_cache_nodes</code> (Redis / Memcached).</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Database / Cache</td>
+        <td><code>aws_elasticache_replication_group</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Priced from node type, cluster count, and replica counts.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Observability</td>
+        <td><code>aws_cloudwatch_metric_alarm</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">Standard CloudWatch alarm monthly charge.</td>
+      </tr>
+      <tr data-status="SUPPORTED">
+        <td>Observability</td>
+        <td><code>aws_cloudwatch_dashboard</code></td>
+        <td><span class="badge badge-supported">SUPPORTED</span></td>
+        <td>No</td>
+        <td class="notes">CloudWatch dashboard monthly fee.</td>
+      </tr>
+
+      <!-- USAGE FILE NEEDED -->
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Storage</td>
+        <td><code>aws_s3_bucket</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Yes</td>
+        <td class="notes">Usage keys: <code>storage_gb</code>, <code>monthly_tier1_requests</code> (PUT/POST/LIST), <code>monthly_tier2_requests</code> (GET/SELECT).</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Serverless</td>
+        <td><code>aws_lambda_function</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Yes</td>
+        <td class="notes">Usage keys: <code>monthly_requests</code> (invocations), <code>request_duration_ms</code>. Memory size configured in plan.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Networking</td>
+        <td><code>aws_nat_gateway</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Partially</td>
+        <td class="notes">Base rate ($0.045/hr) priced automatically. Usage key for traffic: <code>monthly_data_processed_gb</code>.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Networking</td>
+        <td><code>aws_lb</code> / <code>aws_alb</code> / <code>aws_elb</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Partially</td>
+        <td class="notes">Hourly load balancer fee priced automatically. Capacity units usage key: <code>monthly_lcu</code>.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Database</td>
+        <td><code>aws_dynamodb_table</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Optional</td>
+        <td class="notes">Provisioned WCU/RCU priced automatically. On-demand usage keys: <code>storage_gb</code>, <code>monthly_read_request_units</code>, <code>monthly_write_request_units</code>.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Database</td>
+        <td><code>aws_rds_cluster</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Optional</td>
+        <td class="notes">Serverless v2 ACUs priced from plan. Aurora usage keys: <code>storage_gb</code>, <code>monthly_io_requests</code>.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Storage</td>
+        <td><code>aws_ebs_snapshot</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Yes</td>
+        <td class="notes">Usage key: <code>snapshot_size_gb</code> (snapshot storage volume).</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Storage</td>
+        <td><code>aws_ebs_snapshot_copy</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Yes</td>
+        <td class="notes">Usage key: <code>snapshot_size_gb</code>.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Observability</td>
+        <td><code>aws_cloudwatch_log_group</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Yes</td>
+        <td class="notes">Usage keys: <code>monthly_ingested_gb</code>, <code>storage_gb</code>.</td>
+      </tr>
+      <tr data-status="USAGE_FILE_NEEDED">
+        <td>Application Integration</td>
+        <td><code>aws_sqs_queue</code></td>
+        <td><span class="badge badge-usage">USAGE_FILE_NEEDED</span></td>
+        <td>Yes</td>
+        <td class="notes">Usage key: <code>monthly_requests</code> (API requests per month for Standard/FIFO).</td>
+      </tr>
+
+      <!-- NOT BILLABLE -->
+      <tr data-status="NOT_BILLABLE">
+        <td>Networking</td>
+        <td><code>aws_vpc</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">Virtual Private Cloud definition carries no AWS direct charge.</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>Networking</td>
+        <td><code>aws_subnet</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">Subnet IP allocation carries no standalone charge.</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>Networking</td>
+        <td><code>aws_route_table</code> / <code>aws_route_table_association</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">Routing tables and associations are free.</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>Security</td>
+        <td><code>aws_security_group</code> / <code>aws_security_group_rule</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">Stateful firewall rules are free.</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>Networking</td>
+        <td><code>aws_internet_gateway</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">Internet Gateway attachment carries no hourly charge.</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>Identity & Access</td>
+        <td><code>aws_iam_role</code> / <code>aws_iam_policy</code> / <code>aws_iam_instance_profile</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">All IAM roles, policies, attachments, and instance profiles are free.</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>Containers</td>
+        <td><code>aws_ecs_cluster</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">ECS cluster definition is free (associated EC2/Fargate compute is charged separately).</td>
+      </tr>
+      <tr data-status="NOT_BILLABLE">
+        <td>API Gateway</td>
+        <td><code>aws_apigatewayv2_authorizer</code> / <code>aws_apigatewayv2_stage</code></td>
+        <td><span class="badge badge-free">NOT_BILLABLE</span></td>
+        <td>No ($0.00)</td>
+        <td class="notes">Stages and authorizers carry no base hourly fee.</td>
+      </tr>
+
+      <!-- NOT SUPPORTED (COMMON EXAMPLES) -->
+      <tr data-status="NOT_SUPPORTED">
+        <td>Security & Secrets</td>
+        <td><code>aws_kms_key</code>, <code>aws_secretsmanager_secret</code></td>
+        <td><span class="badge badge-unsupported">NOT_SUPPORTED</span></td>
+        <td>N/A</td>
+        <td class="notes">Key fees ($1/mo) and Secret fees ($0.40/mo) not yet in v1 catalog.</td>
+      </tr>
+      <tr data-status="NOT_SUPPORTED">
+        <td>Edge & DNS</td>
+        <td><code>aws_cloudfront_distribution</code>, <code>aws_route53_zone</code>, <code>aws_route53_record</code></td>
+        <td><span class="badge badge-unsupported">NOT_SUPPORTED</span></td>
+        <td>N/A</td>
+        <td class="notes">CDN data transfer, edge requests, and hosted zone fees ($0.50/mo).</td>
+      </tr>
+      <tr data-status="NOT_SUPPORTED">
+        <td>Containers (Serverless)</td>
+        <td><code>aws_ecs_service</code> (Fargate tasks), <code>aws_apprunner_service</code></td>
+        <td><span class="badge badge-unsupported">NOT_SUPPORTED</span></td>
+        <td>N/A</td>
+        <td class="notes">Per-second Fargate vCPU and memory allocations.</td>
+      </tr>
+      <tr data-status="NOT_SUPPORTED">
+        <td>Analytics & Streaming</td>
+        <td><code>aws_opensearch_domain</code>, <code>aws_kinesis_stream</code>, <code>aws_msk_cluster</code></td>
+        <td><span class="badge badge-unsupported">NOT_SUPPORTED</span></td>
+        <td>N/A</td>
+        <td class="notes">Search cluster node instances, Kinesis shard hours, Kafka broker instances.</td>
+      </tr>
+      <tr data-status="NOT_SUPPORTED">
+        <td>Transit & Networking</td>
+        <td><code>aws_ec2_transit_gateway</code>, <code>aws_vpc_endpoint</code> (PrivateLink), <code>aws_vpn_connection</code></td>
+        <td><span class="badge badge-unsupported">NOT_SUPPORTED</span></td>
+        <td>N/A</td>
+        <td class="notes">Attachment fees, PrivateLink endpoint hourly rates + data.</td>
+      </tr>
+      <tr data-status="NOT_SUPPORTED">
+        <td>All Other Resources</td>
+        <td>All other 1,400+ Terraform AWS provider resource types</td>
+        <td><span class="badge badge-unsupported">NOT_SUPPORTED</span></td>
+        <td>N/A</td>
+        <td class="notes">Automatically detected as uncataloged and reported as <code>UNSUPPORTED_TYPE</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="export-bar">
+    <button class="print-btn" onclick="window.print()">Print / Export PDF</button>
+  </div>
+</div>
+
+<script>
+  let currentFilter = 'all';
+
+  function filterTable() {
+    const searchVal = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#resourceTable tbody tr');
+
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      const status = row.getAttribute('data-status');
+
+      const matchesSearch = text.includes(searchVal);
+      const matchesFilter = currentFilter === 'all' || status === currentFilter;
+
+      if (matchesSearch && matchesFilter) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  function setFilter(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTable();
+  }
+</script>
+
+</body>
+</html>

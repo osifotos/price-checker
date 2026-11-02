@@ -7,18 +7,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/osifotos/price-checker/internal/engine"
-	"github.com/osifotos/price-checker/internal/plan"
-	"github.com/osifotos/price-checker/internal/pricing"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/engine"
+	"github.com/osifotos/tfPrice_estimator/internal/plan"
+	"github.com/osifotos/tfPrice_estimator/internal/pricing"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // ---- fakes ----
 
-type fakeLoader struct{ raw string }
+type fakeLoader struct {
+	raw  string
+	info plan.LoadInfo
+}
 
 func (f fakeLoader) Load(ctx context.Context, source string, stdin io.Reader) ([]byte, plan.LoadInfo, error) {
-	return []byte(f.raw), plan.LoadInfo{Mode: "stdin"}, nil
+	return []byte(f.raw), f.info, nil
 }
 
 type fakePricer struct {
@@ -106,6 +109,31 @@ func TestEstimateHappyAndUnsupported(t *testing.T) {
 	}
 	if b.Metadata.PlanFormatVersion != "1.3" {
 		t.Errorf("plan format = %q", b.Metadata.PlanFormatVersion)
+	}
+}
+
+func TestEstimateCarriesProviderDeprecationsWithoutChangingCoverage(t *testing.T) {
+	e := New(Deps{
+		Loader: fakeLoader{raw: planWithRegion, info: plan.LoadInfo{Deprecations: []plan.TerraformDeprecation{{
+			Summary: "Deprecated resource", Detail: "aws_instance is deprecated; use a replacement",
+			Filename: "main.tf", Line: 4,
+		}}}},
+		Parser: plan.NewParser(), Catalog: pricing.NewCatalog(fakePricer{
+			types:      []string{"aws_instance"},
+			components: []schema.CostComponent{{Name: "Instance", Unit: "hours", PricePerUnit: "0.01", MonthlyQuantity: "730", MonthlyCost: "7.3", HourlyCost: "0.01"}},
+		}),
+		Querier: fakeQuerier{}, Region: pricing.RegionResolver{}, Agg: engine.Aggregator{},
+		Now: func() time.Time { return time.Date(2026, 8, 29, 0, 0, 0, 0, time.UTC) },
+	})
+	b, err := e.Estimate(context.Background(), EstimateRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(b.Deprecations) != 1 || b.Deprecations[0].Address != "aws_instance.web" || b.Deprecations[0].Line != 4 {
+		t.Fatalf("provider finding not carried to output: %+v", b.Deprecations)
+	}
+	if b.Summary.ResourcesNotEstimated != 1 {
+		t.Fatalf("deprecation changed pricing coverage: %+v", b.Summary)
 	}
 }
 

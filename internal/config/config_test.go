@@ -10,7 +10,7 @@ import (
 func TestResolvePrecedence(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "price-checker.yml")
-	if err := os.WriteFile(cfgPath, []byte("format: json\nconcurrency: 4\nperiod: hour\n"), 0o600); err != nil {
+	if err := os.WriteFile(cfgPath, []byte("format: json\nconcurrency: 4\nperiod: hour\ndeprecations_file: lifecycle.yml\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -36,6 +36,9 @@ func TestResolvePrecedence(t *testing.T) {
 	}
 	if cfg.Period != "hour" || prov["period"] != SourceFile {
 		t.Errorf("period = %q (%s)", cfg.Period, prov["period"])
+	}
+	if cfg.DeprecationsFile != "lifecycle.yml" || prov["deprecations-file"] != SourceFile {
+		t.Errorf("deprecations-file = %q (%s)", cfg.DeprecationsFile, prov["deprecations-file"])
 	}
 	if cfg.CacheTTL != 7*24*time.Hour || prov["cache-ttl"] != SourceDefault {
 		t.Errorf("cache-ttl = %s (%s), want default 168h", cfg.CacheTTL, prov["cache-ttl"])

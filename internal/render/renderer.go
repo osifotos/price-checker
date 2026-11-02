@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // Options controls presentation. They do not change any value in a document.

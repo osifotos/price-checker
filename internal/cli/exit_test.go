@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/osifotos/price-checker/internal/config"
+	"github.com/osifotos/tfPrice_estimator/internal/config"
 )
 
 func TestEvaluate(t *testing.T) {

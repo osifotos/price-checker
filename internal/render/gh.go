@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 type ghRenderer struct{}
@@ -27,6 +27,7 @@ func (ghRenderer) Render(w io.Writer, b *schema.Breakdown, _ Options) error {
 		fmt.Fprintf(bw, "> :warning: %d resource(s) and %d component(s) not estimated\n\n",
 			b.Summary.ResourcesNotEstimated, b.Summary.ComponentsNotEstimated)
 	}
+	writeDeprecationsMarkdown(bw, b.Deprecations)
 
 	fmt.Fprint(bw, "<details><summary>Full breakdown</summary>\n\n")
 	fmt.Fprintln(bw, "| Resource | Component | Monthly | Hourly |")
@@ -78,8 +79,34 @@ func (ghRenderer) RenderDiff(w io.Writer, d *schema.DiffResult, _ Options) error
 	if notEstimated > 0 {
 		fmt.Fprintf(bw, "> :warning: %d changed resource(s) not estimated\n\n", notEstimated)
 	}
+	writeDeprecationsMarkdown(bw, d.Deprecations)
 	fmt.Fprintf(bw, "<sub>price-checker %s · %s</sub>\n", nonEmpty(d.Metadata.ToolVersion), d.Metadata.GeneratedAt)
 	return bw.Flush()
+}
+
+func writeDeprecationsMarkdown(w io.Writer, findings []schema.Deprecation) {
+	if len(findings) == 0 {
+		return
+	}
+	fmt.Fprintln(w, "**Deprecated resources**")
+	for _, finding := range findings {
+		resource := finding.Address
+		if resource == "" {
+			resource = finding.Type
+		}
+		if resource == "" {
+			resource = "Terraform"
+		}
+		fmt.Fprintf(w, "- `%s` (%s): %s", resource, finding.Source, finding.Message)
+		if finding.Replacement != "" {
+			fmt.Fprintf(w, " Replacement: `%s`.", finding.Replacement)
+		}
+		if finding.Reference != "" {
+			fmt.Fprintf(w, " [Reference](%s)", finding.Reference)
+		}
+		fmt.Fprintln(w)
+	}
+	fmt.Fprintln(w)
 }
 
 func nonEmpty(s string) string {

@@ -16,13 +16,13 @@ import (
 	pricingtypes "github.com/aws/aws-sdk-go-v2/service/pricing/types"
 	"github.com/urfave/cli/v2"
 
-	"github.com/osifotos/price-checker/internal/awsauth"
-	"github.com/osifotos/price-checker/internal/config"
-	"github.com/osifotos/price-checker/internal/diff"
-	"github.com/osifotos/price-checker/internal/estimator"
-	"github.com/osifotos/price-checker/internal/render"
-	"github.com/osifotos/price-checker/internal/usage"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/awsauth"
+	"github.com/osifotos/tfPrice_estimator/internal/config"
+	"github.com/osifotos/tfPrice_estimator/internal/diff"
+	"github.com/osifotos/tfPrice_estimator/internal/estimator"
+	"github.com/osifotos/tfPrice_estimator/internal/render"
+	"github.com/osifotos/tfPrice_estimator/internal/usage"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 func (e *env) versionAction(c *cli.Context) error {
@@ -51,12 +51,13 @@ func (e *env) breakdownAction(c *cli.Context) error {
 	defer cleanup()
 
 	b, err := est.Estimate(c.Context, estimator.EstimateRequest{
-		Source:         cfg.Path,
-		Stdin:          e.stdin,
-		RegionOverride: cfg.AWSRegion,
-		UsagePath:      cfg.UsageFile,
-		Concurrency:    cfg.Concurrency,
-		Period:         renderOptions(cfg).Period,
+		Source:           cfg.Path,
+		Stdin:            e.stdin,
+		RegionOverride:   cfg.AWSRegion,
+		UsagePath:        cfg.UsageFile,
+		DeprecationsPath: cfg.DeprecationsFile,
+		Concurrency:      cfg.Concurrency,
+		Period:           renderOptions(cfg).Period,
 	})
 	if err != nil {
 		return err
@@ -199,12 +200,13 @@ func (e *env) liveVerifyAction(c *cli.Context) error {
 
 func (e *env) request(cfg config.Config) estimator.EstimateRequest {
 	return estimator.EstimateRequest{
-		Source:         cfg.Path,
-		Stdin:          e.stdin,
-		RegionOverride: cfg.AWSRegion,
-		UsagePath:      cfg.UsageFile,
-		Concurrency:    cfg.Concurrency,
-		Period:         renderOptions(cfg).Period,
+		Source:           cfg.Path,
+		Stdin:            e.stdin,
+		RegionOverride:   cfg.AWSRegion,
+		UsagePath:        cfg.UsageFile,
+		DeprecationsPath: cfg.DeprecationsFile,
+		Concurrency:      cfg.Concurrency,
+		Period:           renderOptions(cfg).Period,
 	}
 }
 

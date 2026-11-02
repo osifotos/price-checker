@@ -5,7 +5,7 @@ import (
 	"io"
 	"text/tabwriter"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 type tableRenderer struct{}
@@ -48,6 +48,8 @@ func (tableRenderer) Render(w io.Writer, b *schema.Breakdown, opts Options) erro
 	}
 	fmt.Fprintln(w)
 
+	writeDeprecations(w, b.Deprecations, p)
+
 	if len(b.NotEstimated) > 0 {
 		fmt.Fprintf(w, "\n%sNOT ESTIMATED (%d)%s\n", p.warn, len(b.NotEstimated), p.reset)
 		net := tabwriter.NewWriter(w, 2, 4, 2, ' ', 0)
@@ -82,5 +84,38 @@ func (tableRenderer) RenderDiff(w io.Writer, d *schema.DiffResult, opts Options)
 		fmt.Fprintf(tw, "%s\t%s\t%s\t%s%s\n", c.Address, money2(c.PriorMonthly), money2(c.NewMonthly), signed2(c.DeltaMonthly), note)
 	}
 	fmt.Fprintf(tw, "%sTOTAL CHANGE%s\t\t\t%s%s / month%s\n", p.bold, p.reset, p.bold, signed2(d.TotalDeltaMonthly), p.reset)
-	return tw.Flush()
+	if err := tw.Flush(); err != nil {
+		return err
+	}
+	writeDeprecations(w, d.Deprecations, p)
+	return nil
+}
+
+func writeDeprecations(w io.Writer, findings []schema.Deprecation, p palette) {
+	if len(findings) == 0 {
+		return
+	}
+	fmt.Fprintf(w, "\n%sDEPRECATIONS (%d)%s\n", p.warn, len(findings), p.reset)
+	for _, finding := range findings {
+		resource := finding.Address
+		if resource == "" {
+			resource = finding.Type
+		}
+		if resource == "" {
+			resource = "Terraform"
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\n", resource, finding.Source, finding.Message)
+		if finding.Replacement != "" {
+			fmt.Fprintf(w, "  replacement: %s\n", finding.Replacement)
+		}
+		if finding.EffectiveDate != "" {
+			fmt.Fprintf(w, "  effective: %s\n", finding.EffectiveDate)
+		}
+		if finding.Filename != "" {
+			fmt.Fprintf(w, "  source: %s:%d\n", finding.Filename, finding.Line)
+		}
+		if finding.Reference != "" {
+			fmt.Fprintf(w, "  reference: %s\n", finding.Reference)
+		}
+	}
 }

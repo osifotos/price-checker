@@ -12,7 +12,8 @@ import (
 
 // LoadInfo describes how a plan was obtained.
 type LoadInfo struct {
-	Mode string // "file", "stdin", or "dir"
+	Mode         string // "file", "stdin", or "dir"
+	Deprecations []TerraformDeprecation
 }
 
 // PlanLoader resolves a --path value (or stdin) to raw plan JSON bytes.
@@ -60,39 +61,47 @@ func (l *fileLoader) Load(ctx context.Context, source string, stdin io.Reader) (
 		return b, LoadInfo{Mode: "file"}, nil
 	}
 
-	b, err := l.loadFromDir(ctx, source)
+	b, deprecations, err := l.loadFromDir(ctx, source)
 	if err != nil {
 		return nil, LoadInfo{}, err
 	}
-	return b, LoadInfo{Mode: "dir"}, nil
+	return b, LoadInfo{Mode: "dir", Deprecations: deprecations}, nil
 }
 
-func (l *fileLoader) loadFromDir(ctx context.Context, dir string) ([]byte, error) {
+func (l *fileLoader) loadFromDir(ctx context.Context, dir string) ([]byte, []TerraformDeprecation, error) {
 	if _, err := l.run.lookPath("terraform"); err != nil {
-		return nil, fmt.Errorf(
+		return nil, nil, fmt.Errorf(
 			"-path %q is a directory but 'terraform' was not found on PATH; "+
 				"pass a plan JSON file or pipe 'terraform show -json' output instead", dir)
 	}
 
 	tmp, err := os.CreateTemp("", "price-checker-plan-*.tfplan")
 	if err != nil {
-		return nil, fmt.Errorf("create temp plan file: %w", err)
+		return nil, nil, fmt.Errorf("create temp plan file: %w", err)
 	}
 	tmpPath := tmp.Name()
 	_ = tmp.Close()
 	defer func() { _ = os.Remove(tmpPath) }()
 
-	if _, stderr, err := l.run.run(ctx, dir, "plan", "-input=false", "-out", tmpPath); err != nil {
-		return nil, fmt.Errorf("terraform plan failed: %s: %w", trimStderr(stderr), err)
+	planOutput, stderr, err := l.run.run(ctx, dir, "plan", "-json", "-input=false", "-out", tmpPath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("terraform plan failed: %s: %w", trimStderr(terraformPlanError(planOutput, stderr)), err)
 	}
 	stdout, stderr, err := l.run.run(ctx, dir, "show", "-json", tmpPath)
 	if err != nil {
-		return nil, fmt.Errorf("terraform show -json failed: %s: %w", trimStderr(stderr), err)
+		return nil, nil, fmt.Errorf("terraform show -json failed: %s: %w", trimStderr(stderr), err)
 	}
 	if len(bytes.TrimSpace(stdout)) == 0 {
-		return nil, fmt.Errorf("terraform show -json produced no output for %s", dir)
+		return nil, nil, fmt.Errorf("terraform show -json produced no output for %s", dir)
 	}
-	return stdout, nil
+	return stdout, terraformDeprecations(planOutput), nil
+}
+
+func terraformPlanError(stdout, stderr []byte) []byte {
+	if len(bytes.TrimSpace(stderr)) > 0 {
+		return stderr
+	}
+	return stdout
 }
 
 func trimStderr(b []byte) string {

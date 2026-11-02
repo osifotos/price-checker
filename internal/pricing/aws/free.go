@@ -3,8 +3,8 @@ package aws
 import (
 	"context"
 
-	"github.com/osifotos/price-checker/internal/pricing"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/pricing"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // ---- resource types with no direct AWS charge of their own ----

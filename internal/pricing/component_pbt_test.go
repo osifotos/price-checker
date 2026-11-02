@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 	"pgregory.net/rapid"
 )
 

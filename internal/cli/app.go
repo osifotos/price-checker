@@ -5,7 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/osifotos/price-checker/internal/config"
+	"github.com/osifotos/tfPrice_estimator/internal/config"
 )
 
 type env struct {
@@ -56,6 +56,7 @@ func globalFlags() []cli.Flag {
 		&cli.StringFlag{Name: "out", Aliases: []string{"o"}, EnvVars: []string{"PRICE_CHECKER_OUT"}, Usage: "write output to a file instead of stdout"},
 		&cli.StringFlag{Name: "period", EnvVars: []string{"PRICE_CHECKER_PERIOD"}, Usage: "month | hour"},
 		&cli.StringFlag{Name: "usage-file", EnvVars: []string{"PRICE_CHECKER_USAGE_FILE"}, Usage: "usage assumptions YAML"},
+		&cli.StringFlag{Name: "deprecations-file", EnvVars: []string{"PRICE_CHECKER_DEPRECATIONS_FILE"}, Usage: "AWS resource lifecycle rules YAML"},
 		&cli.StringFlag{Name: "aws-region", EnvVars: []string{"PRICE_CHECKER_AWS_REGION"}, Usage: "override the region for every resource"},
 		&cli.StringFlag{Name: "profile", EnvVars: []string{"AWS_PROFILE"}, Usage: "AWS shared-config profile"},
 		&cli.BoolFlag{Name: "live", EnvVars: []string{"PRICE_CHECKER_LIVE"}, Usage: "opt in to live AWS Price List verification using real credentials"},
@@ -84,6 +85,7 @@ func resolveConfig(c *cli.Context, noColorForced bool) (config.Config, config.Pr
 		"out":                    {Value: c.String("out"), Set: c.IsSet("out")},
 		"period":                 {Value: c.String("period"), Set: c.IsSet("period")},
 		"usage-file":             {Value: c.String("usage-file"), Set: c.IsSet("usage-file")},
+		"deprecations-file":      {Value: c.String("deprecations-file"), Set: c.IsSet("deprecations-file")},
 		"aws-region":             {Value: c.String("aws-region"), Set: c.IsSet("aws-region")},
 		"profile":                {Value: c.String("profile"), Set: c.IsSet("profile")},
 		"live":                   {Value: c.Bool("live"), Set: c.IsSet("live")},

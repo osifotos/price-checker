@@ -3,7 +3,7 @@
 // but is a normal package so it can be imported across units.
 package schematest
 
-import "github.com/osifotos/price-checker/pkg/schema"
+import "github.com/osifotos/tfPrice_estimator/pkg/schema"
 
 // SampleBreakdown returns a canonicalized Breakdown covering estimated and
 // not-estimated resources, modules, and populated metadata.

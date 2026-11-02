@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/osifotos/price-checker/schema/breakdown.schema.json",
+  "$id": "https://github.com/osifotos/tfPrice_estimator/schema/breakdown.schema.json",
   "title": "price-checker breakdown",
   "type": "object",
   "additionalProperties": false,
@@ -17,6 +17,7 @@
     "resources": { "type": "array", "items": { "$ref": "#/$defs/resource" } },
     "modules": { "type": "array", "items": { "$ref": "#/$defs/moduleTotal" } },
     "not_estimated": { "type": "array", "items": { "$ref": "#/$defs/notEstimated" } },
+    "deprecations": { "type": "array", "items": { "$ref": "#/$defs/deprecation" } },
     "summary": { "$ref": "#/$defs/summary" },
     "metadata": { "$ref": "#/$defs/metadata" }
   },
@@ -74,6 +75,22 @@
           "enum": ["UNSUPPORTED_TYPE", "MISSING_ATTRIBUTE", "UNKNOWN_AFTER_APPLY", "NO_USAGE_DATA", "PRICING_API_ERROR", "UNSUPPORTED_CONFIGURATION", "NOT_BILLABLE"]
         },
         "message": { "type": "string" }
+      }
+    },
+    "deprecation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "message"],
+      "properties": {
+        "address": { "type": "string" },
+        "type": { "type": "string" },
+        "source": { "enum": ["terraform-provider", "aws-lifecycle"] },
+        "message": { "type": "string" },
+        "replacement": { "type": "string" },
+        "effective_date": { "type": "string" },
+        "reference": { "type": "string", "format": "uri" },
+        "filename": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 }
       }
     },
     "summary": {

@@ -36,6 +36,7 @@ type DiffResult struct {
 	TotalDeltaMonthly string          `json:"total_delta_monthly"`
 	TotalDeltaHourly  string          `json:"total_delta_hourly"`
 	Summary           CoverageSummary `json:"summary"`
+	Deprecations      []Deprecation   `json:"deprecations,omitempty"`
 	Metadata          RunMetadata     `json:"metadata"`
 }
 
@@ -62,6 +63,7 @@ func NewDiffResult(period Period) *DiffResult {
 		Currency:          "USD",
 		Period:            period,
 		Changes:           []ResourceDelta{},
+		Deprecations:      []Deprecation{},
 		TotalPriorMonthly: "0",
 		TotalNewMonthly:   "0",
 		TotalDeltaMonthly: "0",
@@ -75,6 +77,9 @@ func (d *DiffResult) Canonicalize() {
 	if d.Changes == nil {
 		d.Changes = []ResourceDelta{}
 	}
+	if d.Deprecations == nil {
+		d.Deprecations = []Deprecation{}
+	}
 	if d.Metadata.Regions == nil {
 		d.Metadata.Regions = []string{}
 	}
@@ -85,6 +90,15 @@ func (d *DiffResult) Canonicalize() {
 			return c > 0
 		}
 		return d.Changes[i].Address < d.Changes[j].Address
+	})
+	sort.Slice(d.Deprecations, func(i, j int) bool {
+		if d.Deprecations[i].Address != d.Deprecations[j].Address {
+			return d.Deprecations[i].Address < d.Deprecations[j].Address
+		}
+		if d.Deprecations[i].Type != d.Deprecations[j].Type {
+			return d.Deprecations[i].Type < d.Deprecations[j].Type
+		}
+		return d.Deprecations[i].Message < d.Deprecations[j].Message
 	})
 	sort.Strings(d.Metadata.Regions)
 }

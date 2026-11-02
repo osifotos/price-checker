@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/osifotos/price-checker/internal/config"
-	"github.com/osifotos/price-checker/internal/estimator"
-	"github.com/osifotos/price-checker/internal/plan"
-	"github.com/osifotos/price-checker/pkg/schema"
+	"github.com/osifotos/tfPrice_estimator/internal/config"
+	"github.com/osifotos/tfPrice_estimator/internal/estimator"
+	"github.com/osifotos/tfPrice_estimator/internal/plan"
+	"github.com/osifotos/tfPrice_estimator/pkg/schema"
 )
 
 // Estimator is the slice of *estimator.Estimator the CLI needs; a fake is

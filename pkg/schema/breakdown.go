@@ -14,6 +14,7 @@ type Breakdown struct {
 	TotalMonthly  string          `json:"total_monthly"`
 	TotalHourly   string          `json:"total_hourly"`
 	NotEstimated  []NotEstimated  `json:"not_estimated"`
+	Deprecations  []Deprecation   `json:"deprecations,omitempty"`
 	Summary       CoverageSummary `json:"summary"`
 	Metadata      RunMetadata     `json:"metadata"`
 }
@@ -56,6 +57,19 @@ type NotEstimated struct {
 	Component  string     `json:"component,omitempty"`
 	ReasonCode ReasonCode `json:"reason_code"`
 	Message    string     `json:"message"`
+}
+
+// Deprecation describes a Terraform provider warning or AWS lifecycle notice.
+type Deprecation struct {
+	Address       string `json:"address,omitempty"`
+	Type          string `json:"type,omitempty"`
+	Source        string `json:"source"`
+	Message       string `json:"message"`
+	Replacement   string `json:"replacement,omitempty"`
+	EffectiveDate string `json:"effective_date,omitempty"`
+	Reference     string `json:"reference,omitempty"`
+	Filename      string `json:"filename,omitempty"`
+	Line          int    `json:"line,omitempty"`
 }
 
 // CoverageSummary counts what was and was not estimated.
@@ -110,6 +124,9 @@ func (b *Breakdown) Canonicalize() {
 	if b.NotEstimated == nil {
 		b.NotEstimated = []NotEstimated{}
 	}
+	if b.Deprecations == nil {
+		b.Deprecations = []Deprecation{}
+	}
 	if b.Metadata.Regions == nil {
 		b.Metadata.Regions = []string{}
 	}
@@ -129,6 +146,18 @@ func (b *Breakdown) Canonicalize() {
 			return b.NotEstimated[i].Address < b.NotEstimated[j].Address
 		}
 		return b.NotEstimated[i].Component < b.NotEstimated[j].Component
+	})
+	sort.Slice(b.Deprecations, func(i, j int) bool {
+		if b.Deprecations[i].Address != b.Deprecations[j].Address {
+			return b.Deprecations[i].Address < b.Deprecations[j].Address
+		}
+		if b.Deprecations[i].Type != b.Deprecations[j].Type {
+			return b.Deprecations[i].Type < b.Deprecations[j].Type
+		}
+		if b.Deprecations[i].Source != b.Deprecations[j].Source {
+			return b.Deprecations[i].Source < b.Deprecations[j].Source
+		}
+		return b.Deprecations[i].Message < b.Deprecations[j].Message
 	})
 	sort.Strings(b.Metadata.Regions)
 }
